@@ -1,6 +1,6 @@
 "use server"
 
-import { createAdminClient } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 export type TrainingDivisionExercise = {
@@ -43,7 +43,7 @@ export type TrainingData = {
 }
 
 export async function getTrainingByUserId(userId: string): Promise<TrainingData | null> {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { data, error } = await admin
     .from("api.training")
     .select("*")
@@ -73,7 +73,7 @@ export async function updateDivision(
   payload: { name?: string; description?: string; duration?: number | null },
   userId: string
 ) {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { error } = await admin
     .from("workout.training.division")
     .update(payload)
@@ -84,7 +84,7 @@ export async function updateDivision(
 }
 
 export async function deleteDivision(divisionUuid: string, userId: string) {
-  const admin = createAdminClient()
+  const admin = await createClient()
 
   // Delete exercises first
   await admin
@@ -106,7 +106,7 @@ export async function addDivision(
   userUuid: string,
   order: number
 ) {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { error } = await admin.from("workout.training.division").insert({
     workout_uuid: workoutUuid,
     user_uuid: userUuid,
@@ -122,7 +122,7 @@ export async function updateExerciseSets(
   sets: number,
   userId: string
 ) {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { error } = await admin
     .from("workout.training.division.exercise")
     .update({ sets })
@@ -137,7 +137,7 @@ export async function updateExerciseMethod(
   methodUuid: string | null,
   userId: string
 ) {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { error } = await admin
     .from("workout.training.division.exercise")
     .update({ method_uuid: methodUuid })
@@ -153,7 +153,7 @@ export async function addExerciseToDivision(
   userUuid: string,
   order: number
 ) {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { error } = await admin
     .from("workout.training.division.exercise")
     .insert({
@@ -172,7 +172,7 @@ export async function removeExerciseFromDivision(
   divisionExerciseUuid: string,
   userId: string
 ) {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { error } = await admin
     .from("workout.training.division.exercise")
     .delete()
@@ -187,7 +187,7 @@ export async function swapExerciseInDivision(
   newExerciseUuid: string,
   userId: string
 ) {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { error } = await admin
     .from("workout.training.division.exercise")
     .update({ exercise_uuid: newExerciseUuid, method_uuid: null })

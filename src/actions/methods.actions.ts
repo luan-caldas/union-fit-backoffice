@@ -1,6 +1,6 @@
 "use server"
 
-import { createAdminClient } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import type { Database } from "@/lib/supabase/database.types"
 
@@ -14,7 +14,7 @@ export type MethodRow = {
 }
 
 export async function getMethods(): Promise<MethodRow[]> {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { data, error } = await admin
     .from("workout.method")
     .select("*")
@@ -32,7 +32,7 @@ export async function upsertMethod(payload: {
   level_uuid?: string[]
   objective_uuid?: string[]
 }) {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { error } = await admin.from("workout.method").upsert(payload)
   if (error) throw new Error(error.message)
   revalidatePath("/methods")

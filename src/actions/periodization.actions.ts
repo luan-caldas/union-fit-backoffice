@@ -1,6 +1,6 @@
 "use server"
 
-import { createAdminClient } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 export type PeriodizationDetail = {
@@ -20,7 +20,7 @@ export type PeriodizationWithLevel = {
 }
 
 export async function getPeriodizations(): Promise<PeriodizationWithLevel[]> {
-  const admin = createAdminClient()
+  const admin = await createClient()
 
   const [periodsResult, detailsResult, levelsResult] = await Promise.all([
     admin.from("workout.periodization").select("uuid, level_uuid"),
@@ -60,7 +60,7 @@ export async function upsertPeriodizationDetail(payload: {
   min_repetitions: number
   max_repetitions: number
 }) {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { error } = await admin
     .from("workout.periodization.details")
     .upsert(payload)
@@ -70,7 +70,7 @@ export async function upsertPeriodizationDetail(payload: {
 }
 
 export async function deletePeriodizationDetail(uuid: string) {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { error } = await admin
     .from("workout.periodization.details")
     .delete()

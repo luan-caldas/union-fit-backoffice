@@ -1,6 +1,6 @@
 "use server"
 
-import { createAdminClient } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { getYouTubeThumbnail } from "@/lib/utils/youtube"
 import type { Database } from "@/lib/supabase/database.types"
@@ -18,7 +18,7 @@ export type ExerciseRow = {
 }
 
 export async function getExercises(): Promise<ExerciseRow[]> {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { data, error } = await admin
     .from("workout.exercise")
     .select("*")
@@ -38,7 +38,7 @@ export async function upsertExercise(payload: {
   methods_support_uuid: string[]
   video_url?: string | null
 }) {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const image_url = getYouTubeThumbnail(payload.video_url)
 
   const { error } = await admin.from("workout.exercise").upsert({
@@ -51,7 +51,7 @@ export async function upsertExercise(payload: {
 }
 
 export async function getLevels() {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { data, error } = await admin
     .from("info_workout.level")
     .select("uuid, title, level_enum")
@@ -62,7 +62,7 @@ export async function getLevels() {
 }
 
 export async function getObjectives() {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { data, error } = await admin
     .from("info_workout.objective")
     .select("uuid, title")

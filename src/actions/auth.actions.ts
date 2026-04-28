@@ -1,7 +1,6 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
-import { createAdminClient } from "@/lib/supabase/admin"
 import { redirect } from "next/navigation"
 
 export async function signIn(
@@ -19,16 +18,11 @@ export async function signIn(
     return { error: "Credenciais inválidas. Verifique seu e-mail e senha." }
   }
 
-  console.log(data);
-
-  const admin = createAdminClient()
-  const { data: roleRow } = await admin
+  const { data: roleRow } = await supabase
     .from("user_role")
     .select("role")
     .eq("user_uuid", data.user.id)
     .single()
-
-    console.log(roleRow);
 
   if (roleRow?.role !== "ADMIN") {
     await supabase.auth.signOut()

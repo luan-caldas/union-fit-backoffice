@@ -1,6 +1,6 @@
 "use server"
 
-import { createAdminClient } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 import type { Json } from "@/lib/supabase/database.types"
 
 export type UserWithSubscription = {
@@ -43,7 +43,7 @@ export type ApiTraining = {
 }
 
 export async function getUsers(): Promise<UserWithSubscription[]> {
-  const admin = createAdminClient()
+  const admin = await createClient()
   const { data, error } = await admin
     .from("user")
     .select(
@@ -63,7 +63,7 @@ export async function getUsers(): Promise<UserWithSubscription[]> {
 }
 
 export async function getUserById(id: string) {
-  const admin = createAdminClient()
+  const admin = await createClient()
 
   const [userResult, infoResult, subResult, trainingResult] = await Promise.all(
     [
