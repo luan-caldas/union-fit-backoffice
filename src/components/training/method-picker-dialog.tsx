@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Search, X } from "lucide-react"
 import type { MethodRow } from "@/actions/methods.actions"
+import { ConfirmButton } from "@/components/ui/confirm-button"
 
 interface MethodPickerDialogProps {
   open: boolean
@@ -61,14 +62,19 @@ export function MethodPickerDialog({
 
         <div className="flex-1 overflow-y-auto border-t border-border">
           {currentMethodUuid && (
-            <button
-              type="button"
-              onClick={() => { onSelect(null); onClose() }}
-              className="flex w-full items-center gap-2 px-6 py-3 text-sm text-destructive hover:bg-destructive/5 border-b border-border"
-            >
-              <X className="h-4 w-4" />
-              Remover método
-            </button>
+            <div className="flex items-center gap-2 px-6 py-3 border-b border-border">
+              <X className="h-4 w-4 text-destructive shrink-0" />
+              <span className="text-sm text-destructive flex-1">Remover método</span>
+              <ConfirmButton
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:text-destructive h-7 px-2 text-xs"
+                onConfirm={() => { onSelect(null); onClose() }}
+                confirmLabel="Confirmar remoção"
+              >
+                Remover
+              </ConfirmButton>
+            </div>
           )}
           {filtered.map((method) => (
             <button

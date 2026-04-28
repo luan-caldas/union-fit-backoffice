@@ -45,9 +45,9 @@ export function ExercisesFilters({
       <Select value={muscleFilter} onValueChange={onMuscleFilterChange}>
         <SelectTrigger className="w-44">
           <SelectValue placeholder="Músculo">
-            {muscleFilter !== "all"
-              ? (MUSCLE_OPTIONS.find((m) => m.value === muscleFilter)?.label ?? muscleFilter)
-              : undefined}
+            {muscleFilter === "all"
+              ? "Todos os músculos"
+              : (MUSCLE_OPTIONS.find((m) => m.value === muscleFilter)?.label ?? muscleFilter)}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
@@ -62,9 +62,9 @@ export function ExercisesFilters({
       <Select value={levelFilter} onValueChange={onLevelFilterChange}>
         <SelectTrigger className="w-40">
           <SelectValue placeholder="Nível">
-            {levelFilter !== "all"
-              ? (levels.find((l) => l.uuid === levelFilter)?.title ?? levelFilter)
-              : undefined}
+            {levelFilter === "all"
+              ? "Todos os níveis"
+              : (levels.find((l) => l.uuid === levelFilter)?.title ?? levelFilter)}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>

@@ -18,6 +18,7 @@ import type { MethodRow } from "@/actions/methods.actions"
 import type { ExerciseRow } from "@/actions/exercises.actions"
 import { ExercisePickerDialog } from "./exercise-picker-dialog"
 import { Trash2, RefreshCw, Minus, Plus } from "lucide-react"
+import { ConfirmButton } from "@/components/ui/confirm-button"
 import type { Database } from "@/lib/supabase/database.types"
 
 type Muscle = Database["public"]["Enums"]["Muscle"]
@@ -154,20 +155,16 @@ export function DivisionExerciseRow({
           <TooltipContent>Trocar exercício</TooltipContent>
         </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-muted-foreground hover:text-destructive"
-              onClick={handleRemove}
-              disabled={isPending}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Remover</TooltipContent>
-        </Tooltip>
+        <ConfirmButton
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-muted-foreground hover:text-destructive"
+          onConfirm={handleRemove}
+          disabled={isPending}
+          confirmLabel="Remover"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </ConfirmButton>
       </div>
 
       <MethodPickerDialog

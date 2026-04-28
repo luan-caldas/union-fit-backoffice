@@ -77,7 +77,11 @@ export function ExercisePickerDialog({
           </div>
           <Select value={muscleFilter} onValueChange={setMuscleFilter}>
             <SelectTrigger className="w-44">
-              <SelectValue placeholder="Músculo" />
+              <SelectValue placeholder="Músculo">
+                {muscleFilter === "all"
+                  ? "Todos os músculos"
+                  : (MUSCLE_OPTIONS.find((m) => m.value === muscleFilter)?.label ?? muscleFilter)}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os músculos</SelectItem>

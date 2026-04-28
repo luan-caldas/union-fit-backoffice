@@ -12,6 +12,7 @@ import {
 } from "@/hooks/use-periodization"
 import type { PeriodizationDetail } from "@/actions/periodization.actions"
 import { Pencil, Trash2, Check, X, Plus } from "lucide-react"
+import { ConfirmButton } from "@/components/ui/confirm-button"
 
 const schema = z.object({
   min_repetitions: z.coerce.number().int().min(1),
@@ -94,15 +95,16 @@ export function PeriodizationDetailRow({ detail, periodizationUuid }: DetailRowP
           >
             <Pencil className="h-3.5 w-3.5" />
           </Button>
-          <Button
+          <ConfirmButton
             size="icon"
             variant="ghost"
             className="h-7 w-7 text-destructive hover:text-destructive"
-            onClick={() => remove(detail.uuid)}
+            onConfirm={() => remove(detail.uuid)}
             disabled={deleting}
+            confirmLabel="Excluir"
           >
             <Trash2 className="h-3.5 w-3.5" />
-          </Button>
+          </ConfirmButton>
         </>
       )}
     </div>

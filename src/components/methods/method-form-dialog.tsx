@@ -21,6 +21,7 @@ import { useLevels, useObjectives } from "@/hooks/use-exercises"
 import { getYouTubeThumbnail } from "@/lib/utils/youtube"
 import type { MethodRow } from "@/actions/methods.actions"
 import { Trash2 } from "lucide-react"
+import { ConfirmButton } from "@/components/ui/confirm-button"
 
 const schema = z.object({
   name: z.string().min(1, "Nome obrigatório"),
@@ -179,16 +180,16 @@ export function MethodFormDialog({ open, onClose, method }: MethodFormDialogProp
 
           <DialogFooter className="flex-row items-center">
             {method && (
-              <Button
-                type="button"
+              <ConfirmButton
                 variant="ghost"
                 className="mr-auto text-destructive hover:text-destructive"
-                onClick={handleDelete}
+                onConfirm={handleDelete}
                 disabled={isDeleting}
+                confirmLabel="Excluir mesmo assim"
               >
                 <Trash2 className="h-4 w-4 mr-1.5" />
                 {isDeleting ? "Excluindo..." : "Excluir"}
-              </Button>
+              </ConfirmButton>
             )}
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar

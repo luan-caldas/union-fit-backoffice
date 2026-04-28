@@ -64,7 +64,10 @@ export async function getTrainingByUserId(userId: string): Promise<TrainingData 
     sessions_per_week: data.sessions_per_week,
     level: data.level,
     periodization: data.periodization as TrainingData["periodization"],
-    divisions: (data.divisions as TrainingDivision[]) ?? [],
+    divisions: ((data.divisions as TrainingDivision[]) ?? []).map((d) => ({
+      ...d,
+      exercises: d.exercises ?? [],
+    })),
   }
 }
 

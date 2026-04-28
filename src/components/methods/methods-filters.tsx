@@ -45,9 +45,9 @@ export function MethodsFilters({
       <Select value={levelFilter} onValueChange={onLevelFilterChange}>
         <SelectTrigger className="w-40">
           <SelectValue placeholder="Nível">
-            {levelFilter !== "all"
-              ? (levels.find((l) => l.uuid === levelFilter)?.title ?? levelFilter)
-              : undefined}
+            {levelFilter === "all"
+              ? "Todos os níveis"
+              : (levels.find((l) => l.uuid === levelFilter)?.title ?? levelFilter)}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
@@ -62,9 +62,9 @@ export function MethodsFilters({
       <Select value={objectiveFilter} onValueChange={onObjectiveFilterChange}>
         <SelectTrigger className="w-44">
           <SelectValue placeholder="Objetivo">
-            {objectiveFilter !== "all"
-              ? (objectives.find((o) => o.uuid === objectiveFilter)?.title ?? objectiveFilter)
-              : undefined}
+            {objectiveFilter === "all"
+              ? "Todos os objetivos"
+              : (objectives.find((o) => o.uuid === objectiveFilter)?.title ?? objectiveFilter)}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>

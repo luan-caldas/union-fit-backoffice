@@ -30,6 +30,7 @@ import { getYouTubeThumbnail } from "@/lib/utils/youtube"
 import type { ExerciseRow } from "@/actions/exercises.actions"
 import type { Database } from "@/lib/supabase/database.types"
 import { X, Trash2 } from "lucide-react"
+import { ConfirmButton } from "@/components/ui/confirm-button"
 
 type Muscle = Database["public"]["Enums"]["Muscle"]
 type RepetitionType = Database["public"]["Enums"]["RepetitionType"]
@@ -276,16 +277,16 @@ export function ExerciseFormDialog({
 
           <DialogFooter className="flex-row items-center">
             {exercise && (
-              <Button
-                type="button"
+              <ConfirmButton
                 variant="ghost"
                 className="mr-auto text-destructive hover:text-destructive"
-                onClick={handleDelete}
+                onConfirm={handleDelete}
                 disabled={isDeleting}
+                confirmLabel="Excluir mesmo assim"
               >
                 <Trash2 className="h-4 w-4 mr-1.5" />
                 {isDeleting ? "Excluindo..." : "Excluir"}
-              </Button>
+              </ConfirmButton>
             )}
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
