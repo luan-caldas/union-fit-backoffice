@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/luanp/Projects/**)",
+      "Bash(powershell -Command \"Get-ChildItem -Path 'C:\\\\Users\\\\luanp\\\\Projects\\\\backoffice' -Force -Recurse 2>&1 | Select-Object FullName | head -100\")",
+      "mcp__claude_ai_Figma__get_design_context",
+      "mcp__claude_ai_Supabase__list_projects",
+      "mcp__claude_ai_Figma__get_metadata",
+      "mcp__claude_ai_Supabase__list_tables",
+      "mcp__claude_ai_Supabase__get_project_url",
+      "mcp__claude_ai_Supabase__get_publishable_keys",
+      "mcp__claude_ai_Supabase__generate_typescript_types",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npm install *)",
+      "Bash(npx shadcn@latest init --yes --defaults)",
+      "Bash(npx shadcn@latest add button input table dialog badge select form label textarea avatar accordion tooltip skeleton separator --yes)",
+      "Bash(npx shadcn@latest add form --yes)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\luanp\\Projects\\backoffice\\src\\app\\(admin\\)\\users"
+    ]
+  }
+}
