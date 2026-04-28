@@ -24,6 +24,13 @@ export async function getMethods(): Promise<MethodRow[]> {
   return data ?? []
 }
 
+export async function deleteMethod(uuid: string) {
+  const admin = await createClient()
+  const { error } = await admin.from("workout.method").delete().eq("uuid", uuid)
+  if (error) throw new Error(error.message)
+  revalidatePath("/methods")
+}
+
 export async function upsertMethod(payload: {
   uuid?: string
   name: string

@@ -23,13 +23,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { useUpsertExercise, useLevels } from "@/hooks/use-exercises"
+import { useUpsertExercise, useDeleteExercise, useLevels } from "@/hooks/use-exercises"
 import { useMethods } from "@/hooks/use-methods"
 import { MUSCLE_OPTIONS } from "@/lib/constants/muscles"
 import { getYouTubeThumbnail } from "@/lib/utils/youtube"
 import type { ExerciseRow } from "@/actions/exercises.actions"
 import type { Database } from "@/lib/supabase/database.types"
-import { X } from "lucide-react"
+import { X, Trash2 } from "lucide-react"
 
 type Muscle = Database["public"]["Enums"]["Muscle"]
 type RepetitionType = Database["public"]["Enums"]["RepetitionType"]
@@ -60,6 +60,7 @@ export function ExerciseFormDialog({
   const { data: levels = [] } = useLevels()
   const { data: methods = [] } = useMethods()
   const { mutateAsync, isPending } = useUpsertExercise()
+  const { mutateAsync: deleteExercise, isPending: isDeleting } = useDeleteExercise()
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
 
   const {
@@ -119,6 +120,12 @@ export function ExerciseFormDialog({
     }
   }, [open, exercise, reset])
 
+  async function handleDelete() {
+    if (!exercise) return
+    await deleteExercise(exercise.uuid)
+    onClose()
+  }
+
   async function onSubmit(values: FormValues) {
     await mutateAsync({
       uuid: exercise?.uuid,
@@ -177,7 +184,11 @@ export function ExerciseFormDialog({
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecionar" />
+                      <SelectValue placeholder="Selecionar">
+                        {field.value
+                          ? (MUSCLE_OPTIONS.find((m) => m.value === field.value)?.label ?? field.value)
+                          : undefined}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {MUSCLE_OPTIONS.map((m) => (
@@ -200,7 +211,9 @@ export function ExerciseFormDialog({
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue>
+                        {field.value === "PERIODIZATION" ? "Periodização" : field.value === "ISOMETRIC" ? "Isométrico" : undefined}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="PERIODIZATION">Periodização</SelectItem>
@@ -261,7 +274,19 @@ export function ExerciseFormDialog({
             )}
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-row items-center">
+            {exercise && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="mr-auto text-destructive hover:text-destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                <Trash2 className="h-4 w-4 mr-1.5" />
+                {isDeleting ? "Excluindo..." : "Excluir"}
+              </Button>
+            )}
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>

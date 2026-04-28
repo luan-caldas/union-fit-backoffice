@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getExercises, upsertExercise, getLevels, getObjectives } from "@/actions/exercises.actions"
+import { getExercises, upsertExercise, deleteExercise, getLevels, getObjectives } from "@/actions/exercises.actions"
 import type { ExerciseRow } from "@/actions/exercises.actions"
 import type { Database } from "@/lib/supabase/database.types"
 
@@ -16,6 +16,14 @@ export function useUpsertExercise() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: upsertExercise,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["exercises"] }),
+  })
+}
+
+export function useDeleteExercise() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: deleteExercise,
     onSuccess: () => qc.invalidateQueries({ queryKey: ["exercises"] }),
   })
 }

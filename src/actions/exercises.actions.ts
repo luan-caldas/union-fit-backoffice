@@ -50,6 +50,13 @@ export async function upsertExercise(payload: {
   revalidatePath("/exercises")
 }
 
+export async function deleteExercise(uuid: string) {
+  const admin = await createClient()
+  const { error } = await admin.from("workout.exercise").delete().eq("uuid", uuid)
+  if (error) throw new Error(error.message)
+  revalidatePath("/exercises")
+}
+
 export async function getLevels() {
   const admin = await createClient()
   const { data, error } = await admin

@@ -44,21 +44,27 @@ export type ApiTraining = {
 
 export async function getUsers(): Promise<UserWithSubscription[]> {
   const admin = await createClient()
-  const { data, error } = await admin
-    .from("user")
-    .select(
-      "id, name, email, image_profile, deleted_at, user_subscriptions(is_active, expiration_at, entitlement_id, last_event_type, last_event_at)"
-    )
-    .is("deleted_at", null)
-    .order("name")
 
-  if (error) throw new Error(error.message)
+  const [usersResult, subsResult] = await Promise.all([
+    admin
+      .from("user")
+      .select("id, name, email, image_profile, deleted_at")
+      .is("deleted_at", null)
+      .order("name"),
+    admin
+      .from("user_subscriptions")
+      .select("user_id, is_active, expiration_at, entitlement_id, last_event_type, last_event_at"),
+  ])
 
-  return (data ?? []).map((u) => ({
+  if (usersResult.error) throw new Error(usersResult.error.message)
+
+  const subsMap = new Map(
+    (subsResult.data ?? []).map((s) => [s.user_id, s])
+  )
+
+  return (usersResult.data ?? []).map((u) => ({
     ...u,
-    user_subscriptions: Array.isArray(u.user_subscriptions)
-      ? (u.user_subscriptions[0] ?? null)
-      : (u.user_subscriptions ?? null),
+    user_subscriptions: subsMap.get(u.id) ?? null,
   }))
 }
 

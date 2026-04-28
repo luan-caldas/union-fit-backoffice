@@ -16,10 +16,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { useUpsertMethod } from "@/hooks/use-methods"
+import { useUpsertMethod, useDeleteMethod } from "@/hooks/use-methods"
 import { useLevels, useObjectives } from "@/hooks/use-exercises"
 import { getYouTubeThumbnail } from "@/lib/utils/youtube"
 import type { MethodRow } from "@/actions/methods.actions"
+import { Trash2 } from "lucide-react"
 
 const schema = z.object({
   name: z.string().min(1, "Nome obrigatório"),
@@ -41,6 +42,7 @@ export function MethodFormDialog({ open, onClose, method }: MethodFormDialogProp
   const { data: levels = [] } = useLevels()
   const { data: objectives = [] } = useObjectives()
   const { mutateAsync, isPending } = useUpsertMethod()
+  const { mutateAsync: deleteMethod, isPending: isDeleting } = useDeleteMethod()
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
 
   const {
@@ -82,6 +84,12 @@ export function MethodFormDialog({ open, onClose, method }: MethodFormDialogProp
       reset({ name: "", description: "", video_url: "", level_uuid: [], objective_uuid: [] })
     }
   }, [open, method, reset])
+
+  async function handleDelete() {
+    if (!method) return
+    await deleteMethod(method.uuid)
+    onClose()
+  }
 
   async function onSubmit(values: FormValues) {
     await mutateAsync({
@@ -169,7 +177,19 @@ export function MethodFormDialog({ open, onClose, method }: MethodFormDialogProp
             )}
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-row items-center">
+            {method && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="mr-auto text-destructive hover:text-destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                <Trash2 className="h-4 w-4 mr-1.5" />
+                {isDeleting ? "Excluindo..." : "Excluir"}
+              </Button>
+            )}
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
