@@ -1,6 +1,6 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
+import { requireAdmin } from "@/lib/auth/require-admin"
 import type { Json } from "@/lib/supabase/database.types"
 
 export type UserWithSubscription = {
@@ -43,7 +43,7 @@ export type ApiTraining = {
 }
 
 export async function getUsers(): Promise<UserWithSubscription[]> {
-  const admin = await createClient()
+  const admin = await requireAdmin()
 
   const [usersResult, subsResult] = await Promise.all([
     admin
@@ -56,7 +56,7 @@ export async function getUsers(): Promise<UserWithSubscription[]> {
       .select("user_id, is_active, expiration_at, entitlement_id, last_event_type, last_event_at"),
   ])
 
-  if (usersResult.error) throw new Error(usersResult.error.message)
+  if (usersResult.error) throw new Error("Erro ao carregar usuários.")
 
   const subsMap = new Map(
     (subsResult.data ?? []).map((s) => [s.user_id, s])
@@ -69,7 +69,7 @@ export async function getUsers(): Promise<UserWithSubscription[]> {
 }
 
 export async function getUserById(id: string) {
-  const admin = await createClient()
+  const admin = await requireAdmin()
 
   const [userResult, infoResult, subResult, trainingResult] = await Promise.all(
     [
@@ -94,7 +94,7 @@ export async function getUserById(id: string) {
     ]
   )
 
-  if (userResult.error) throw new Error(userResult.error.message)
+  if (userResult.error) throw new Error("Erro ao carregar usuário.")
 
   return {
     user: userResult.data,

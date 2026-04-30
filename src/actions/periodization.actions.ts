@@ -1,6 +1,6 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
+import { requireAdmin } from "@/lib/auth/require-admin"
 import { revalidatePath } from "next/cache"
 
 export type PeriodizationDetail = {
@@ -20,7 +20,7 @@ export type PeriodizationWithLevel = {
 }
 
 export async function getPeriodizations(): Promise<PeriodizationWithLevel[]> {
-  const admin = await createClient()
+  const admin = await requireAdmin()
 
   const [periodsResult, detailsResult, levelsResult] = await Promise.all([
     admin.from("workout.periodization").select("uuid, level_uuid"),
@@ -34,9 +34,9 @@ export async function getPeriodizations(): Promise<PeriodizationWithLevel[]> {
       .order("order"),
   ])
 
-  if (periodsResult.error) throw new Error(periodsResult.error.message)
-  if (detailsResult.error) throw new Error(detailsResult.error.message)
-  if (levelsResult.error) throw new Error(levelsResult.error.message)
+  if (periodsResult.error) throw new Error("Erro ao carregar periodizações.")
+  if (detailsResult.error) throw new Error("Erro ao carregar detalhes.")
+  if (levelsResult.error) throw new Error("Erro ao carregar níveis.")
 
   const levels = levelsResult.data ?? []
   const details = detailsResult.data ?? []
@@ -60,22 +60,22 @@ export async function upsertPeriodizationDetail(payload: {
   min_repetitions: number
   max_repetitions: number
 }) {
-  const admin = await createClient()
+  const admin = await requireAdmin()
   const { error } = await admin
     .from("workout.periodization.details")
     .upsert(payload)
 
-  if (error) throw new Error(error.message)
+  if (error) throw new Error("Erro ao salvar detalhe.")
   revalidatePath("/periodization")
 }
 
 export async function deletePeriodizationDetail(uuid: string) {
-  const admin = await createClient()
+  const admin = await requireAdmin()
   const { error } = await admin
     .from("workout.periodization.details")
     .delete()
     .eq("uuid", uuid)
 
-  if (error) throw new Error(error.message)
+  if (error) throw new Error("Erro ao excluir detalhe.")
   revalidatePath("/periodization")
 }

@@ -1,6 +1,6 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
+import { requireAdmin } from "@/lib/auth/require-admin"
 import { revalidatePath } from "next/cache"
 
 export type TrainingDivisionExercise = {
@@ -43,7 +43,7 @@ export type TrainingData = {
 }
 
 export async function getTrainingByUserId(userId: string): Promise<TrainingData | null> {
-  const admin = await createClient()
+  const admin = await requireAdmin()
   const { data, error } = await admin
     .from("api.training")
     .select("*")
@@ -52,7 +52,7 @@ export async function getTrainingByUserId(userId: string): Promise<TrainingData 
     .limit(1)
     .maybeSingle()
 
-  if (error) throw new Error(error.message)
+  if (error) throw new Error("Erro ao carregar treino.")
   if (!data) return null
 
   return {
@@ -76,20 +76,19 @@ export async function updateDivision(
   payload: { name?: string; description?: string; duration?: number | null },
   userId: string
 ) {
-  const admin = await createClient()
+  const admin = await requireAdmin()
   const { error } = await admin
     .from("workout.training.division")
     .update(payload)
     .eq("uuid", divisionUuid)
 
-  if (error) throw new Error(error.message)
+  if (error) throw new Error("Erro ao atualizar divisão.")
   revalidatePath(`/users/${userId}`)
 }
 
 export async function deleteDivision(divisionUuid: string, userId: string) {
-  const admin = await createClient()
+  const admin = await requireAdmin()
 
-  // Delete exercises first
   await admin
     .from("workout.training.division.exercise")
     .delete()
@@ -100,7 +99,7 @@ export async function deleteDivision(divisionUuid: string, userId: string) {
     .delete()
     .eq("uuid", divisionUuid)
 
-  if (error) throw new Error(error.message)
+  if (error) throw new Error("Erro ao excluir divisão.")
   revalidatePath(`/users/${userId}`)
 }
 
@@ -109,14 +108,14 @@ export async function addDivision(
   userUuid: string,
   order: number
 ) {
-  const admin = await createClient()
+  const admin = await requireAdmin()
   const { error } = await admin.from("workout.training.division").insert({
     workout_uuid: workoutUuid,
     user_uuid: userUuid,
     name: `Treino ${String.fromCharCode(65 + order)}`,
     order,
   })
-  if (error) throw new Error(error.message)
+  if (error) throw new Error("Erro ao adicionar divisão.")
   revalidatePath(`/users/${userUuid}`)
 }
 
@@ -125,13 +124,13 @@ export async function updateExerciseSets(
   sets: number,
   userId: string
 ) {
-  const admin = await createClient()
+  const admin = await requireAdmin()
   const { error } = await admin
     .from("workout.training.division.exercise")
     .update({ sets })
     .eq("uuid", exerciseUuid)
 
-  if (error) throw new Error(error.message)
+  if (error) throw new Error("Erro ao atualizar séries.")
   revalidatePath(`/users/${userId}`)
 }
 
@@ -140,13 +139,13 @@ export async function updateExerciseMethod(
   methodUuid: string | null,
   userId: string
 ) {
-  const admin = await createClient()
+  const admin = await requireAdmin()
   const { error } = await admin
     .from("workout.training.division.exercise")
     .update({ method_uuid: methodUuid })
     .eq("uuid", exerciseUuid)
 
-  if (error) throw new Error(error.message)
+  if (error) throw new Error("Erro ao atualizar método.")
   revalidatePath(`/users/${userId}`)
 }
 
@@ -156,7 +155,7 @@ export async function addExerciseToDivision(
   userUuid: string,
   order: number
 ) {
-  const admin = await createClient()
+  const admin = await requireAdmin()
   const { error } = await admin
     .from("workout.training.division.exercise")
     .insert({
@@ -167,7 +166,7 @@ export async function addExerciseToDivision(
       order,
     })
 
-  if (error) throw new Error(error.message)
+  if (error) throw new Error("Erro ao adicionar exercício.")
   revalidatePath(`/users/${userUuid}`)
 }
 
@@ -175,13 +174,13 @@ export async function removeExerciseFromDivision(
   divisionExerciseUuid: string,
   userId: string
 ) {
-  const admin = await createClient()
+  const admin = await requireAdmin()
   const { error } = await admin
     .from("workout.training.division.exercise")
     .delete()
     .eq("uuid", divisionExerciseUuid)
 
-  if (error) throw new Error(error.message)
+  if (error) throw new Error("Erro ao remover exercício.")
   revalidatePath(`/users/${userId}`)
 }
 
@@ -190,12 +189,12 @@ export async function swapExerciseInDivision(
   newExerciseUuid: string,
   userId: string
 ) {
-  const admin = await createClient()
+  const admin = await requireAdmin()
   const { error } = await admin
     .from("workout.training.division.exercise")
     .update({ exercise_uuid: newExerciseUuid, method_uuid: null })
     .eq("uuid", divisionExerciseUuid)
 
-  if (error) throw new Error(error.message)
+  if (error) throw new Error("Erro ao trocar exercício.")
   revalidatePath(`/users/${userId}`)
 }
