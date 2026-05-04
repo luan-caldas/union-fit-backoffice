@@ -14,7 +14,8 @@
       "Bash(npm install *)",
       "Bash(npx shadcn@latest init --yes --defaults)",
       "Bash(npx shadcn@latest add button input table dialog badge select form label textarea avatar accordion tooltip skeleton separator --yes)",
-      "Bash(npx shadcn@latest add form --yes)"
+      "Bash(npx shadcn@latest add form --yes)",
+      "WebFetch(domain:supabase.com)"
     ],
     "additionalDirectories": [
       "c:\\Users\\luanp\\Projects\\backoffice\\src\\app\\(admin\\)\\users"
