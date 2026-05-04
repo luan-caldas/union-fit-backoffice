@@ -1,12 +1,10 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { MUSCLE_LABELS } from "@/lib/constants/muscles"
 import { getYouTubeThumbnail } from "@/lib/utils/youtube"
 import type { ExerciseRow } from "@/actions/exercises.actions"
 import type { Database } from "@/lib/supabase/database.types"
-import { Pencil } from "lucide-react"
 
 type Muscle = Database["public"]["Enums"]["Muscle"]
 
@@ -20,7 +18,10 @@ export function ExerciseCard({ exercise, onEdit }: ExerciseCardProps) {
     getYouTubeThumbnail(exercise.video_url) ?? exercise.image_url ?? null
 
   return (
-    <div className="group relative rounded-xl border border-border bg-white overflow-hidden hover:shadow-sm transition-shadow">
+    <div
+      className="rounded-xl border border-border bg-white overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      onClick={() => onEdit(exercise)}
+    >
       <div className="aspect-video w-full bg-surface-highest overflow-hidden">
         {thumbnail ? (
           <img
@@ -49,15 +50,6 @@ export function ExerciseCard({ exercise, onEdit }: ExerciseCardProps) {
         )}
       </div>
 
-      <Button
-        variant="secondary"
-        size="icon"
-        className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-        onClick={() => onEdit(exercise)}
-        title="Editar"
-      >
-        <Pencil className="h-3.5 w-3.5" />
-      </Button>
     </div>
   )
 }
