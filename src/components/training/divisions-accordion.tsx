@@ -39,7 +39,7 @@ export function DivisionsAccordion({
 
   return (
     <div className="space-y-2">
-      <Accordion type="multiple" className="space-y-2">
+      <Accordion className="space-y-2">
         {training.divisions.map((division) => (
           <AccordionItem
             key={division.uuid}

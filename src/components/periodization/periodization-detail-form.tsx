@@ -15,8 +15,8 @@ import { Pencil, Trash2, Check, X, Plus } from "lucide-react"
 import { ConfirmButton } from "@/components/ui/confirm-button"
 
 const schema = z.object({
-  min_repetitions: z.coerce.number().int().min(1),
-  max_repetitions: z.coerce.number().int().min(1),
+  min_repetitions: z.number().int().min(1),
+  max_repetitions: z.number().int().min(1),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -63,13 +63,13 @@ export function PeriodizationDetailRow({ detail, periodizationUuid }: DetailRowP
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-1 items-center gap-2">
           <div className="flex items-center gap-1.5">
             <Input
-              {...register("min_repetitions")}
+              {...register("min_repetitions", { valueAsNumber: true })}
               type="number"
               className="h-7 w-16 text-center text-sm"
             />
             <span className="text-muted-foreground text-xs">–</span>
             <Input
-              {...register("max_repetitions")}
+              {...register("max_repetitions", { valueAsNumber: true })}
               type="number"
               className="h-7 w-16 text-center text-sm"
             />

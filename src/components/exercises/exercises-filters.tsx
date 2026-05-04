@@ -42,7 +42,7 @@ export function ExercisesFilters({
           className="pl-9"
         />
       </div>
-      <Select value={muscleFilter} onValueChange={onMuscleFilterChange}>
+      <Select value={muscleFilter} onValueChange={(v) => onMuscleFilterChange(v ?? "all")}>
         <SelectTrigger className="w-44">
           <SelectValue placeholder="Músculo">
             {muscleFilter === "all"
@@ -59,7 +59,7 @@ export function ExercisesFilters({
           ))}
         </SelectContent>
       </Select>
-      <Select value={levelFilter} onValueChange={onLevelFilterChange}>
+      <Select value={levelFilter} onValueChange={(v) => onLevelFilterChange(v ?? "all")}>
         <SelectTrigger className="w-40">
           <SelectValue placeholder="Nível">
             {levelFilter === "all"

@@ -51,12 +51,12 @@ export function UserInfoWorkoutCard({ infoWorkout }: UserInfoWorkoutCardProps) {
 
         <dt className="text-muted-foreground">Altura</dt>
         <dd className="font-medium">
-          {iwd.height ? `${iwd.height} cm` : "—"}
+          {iwd.height ? `${String(iwd.height)} cm` : "—"}
         </dd>
 
         <dt className="text-muted-foreground">Peso</dt>
         <dd className="font-medium">
-          {iwd.weight ? `${iwd.weight} kg` : "—"}
+          {iwd.weight ? `${String(iwd.weight)} kg` : "—"}
         </dd>
 
         <dt className="text-muted-foreground">Nível</dt>
@@ -66,7 +66,7 @@ export function UserInfoWorkoutCard({ infoWorkout }: UserInfoWorkoutCardProps) {
 
         <dt className="text-muted-foreground">Duração da sessão</dt>
         <dd className="font-medium">
-          {iwd.session_duration ? `${iwd.session_duration} min` : "—"}
+          {iwd.session_duration ? `${String(iwd.session_duration)} min` : "—"}
         </dd>
 
         <dt className="text-muted-foreground">Objetivos</dt>
@@ -90,7 +90,7 @@ export function UserInfoWorkoutCard({ infoWorkout }: UserInfoWorkoutCardProps) {
             : "—"}
         </dd>
 
-        {iwd.limitation && (
+        {!!iwd.limitation && (
           <>
             <dt className="text-muted-foreground">Limitações</dt>
             <dd className="font-medium">{String(iwd.limitation)}</dd>

@@ -34,7 +34,7 @@ export function UsersFilters({
           className="pl-9"
         />
       </div>
-      <Select value={subscriptionFilter} onValueChange={onSubscriptionFilterChange}>
+      <Select value={subscriptionFilter} onValueChange={(v) => onSubscriptionFilterChange(v ?? "all")}>
         <SelectTrigger className="w-44">
           <SelectValue placeholder="Assinatura" />
         </SelectTrigger>

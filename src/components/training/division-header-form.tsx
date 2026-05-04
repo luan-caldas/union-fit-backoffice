@@ -36,8 +36,8 @@ export function DivisionHeaderActions({
       await updateDivision(
         division.uuid,
         {
-          name: name || null,
-          description: description || null,
+          name: name || undefined,
+          description: description || undefined,
           duration: duration ? Number(duration) : null,
         },
         userUuid

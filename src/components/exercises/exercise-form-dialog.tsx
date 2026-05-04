@@ -183,7 +183,7 @@ export function ExerciseFormDialog({
                 name="muscle"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={(v) => field.onChange(v ?? "")}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecionar">
                         {field.value
@@ -210,7 +210,7 @@ export function ExerciseFormDialog({
                 name="repetition_type"
                 control={control}
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={(v) => field.onChange(v ?? "")}>
                     <SelectTrigger>
                       <SelectValue>
                         {field.value === "PERIODIZATION" ? "Periodização" : field.value === "ISOMETRIC" ? "Isométrico" : undefined}

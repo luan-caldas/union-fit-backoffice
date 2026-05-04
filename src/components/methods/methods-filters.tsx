@@ -42,7 +42,7 @@ export function MethodsFilters({
           className="pl-9"
         />
       </div>
-      <Select value={levelFilter} onValueChange={onLevelFilterChange}>
+      <Select value={levelFilter} onValueChange={(v) => onLevelFilterChange(v ?? "all")}>
         <SelectTrigger className="w-40">
           <SelectValue placeholder="Nível">
             {levelFilter === "all"
@@ -59,7 +59,7 @@ export function MethodsFilters({
           ))}
         </SelectContent>
       </Select>
-      <Select value={objectiveFilter} onValueChange={onObjectiveFilterChange}>
+      <Select value={objectiveFilter} onValueChange={(v) => onObjectiveFilterChange(v ?? "all")}>
         <SelectTrigger className="w-44">
           <SelectValue placeholder="Objetivo">
             {objectiveFilter === "all"
