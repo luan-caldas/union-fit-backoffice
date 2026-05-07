@@ -1,6 +1,18 @@
 "use client"
 
-import { useTransition } from "react"
+import { useState, useEffect, useTransition } from "react"
+import {
+  DndContext,
+  closestCenter,
+  type DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 import {
   Accordion,
   AccordionContent,
@@ -10,17 +22,72 @@ import {
 import { Button } from "@/components/ui/button"
 import { DivisionExerciseRow } from "./division-exercise-row"
 import { DivisionHeaderActions } from "./division-header-form"
-import { addDivision } from "@/actions/training.actions"
-import type { TrainingData } from "@/actions/training.actions"
+import { addDivision, reorderExercises } from "@/actions/training.actions"
+import type { TrainingData, TrainingDivisionExercise } from "@/actions/training.actions"
 import type { MethodRow } from "@/actions/methods.actions"
 import type { ExerciseRow } from "@/actions/exercises.actions"
-import { Plus } from "lucide-react"
+import { GripVertical, Plus } from "lucide-react"
 
 interface DivisionsAccordionProps {
   training: TrainingData
   methods: MethodRow[]
   allExercises: ExerciseRow[]
   userId: string
+}
+
+interface SortableRowProps {
+  exercise: TrainingDivisionExercise
+  methods: MethodRow[]
+  allExercises: ExerciseRow[]
+  userId: string
+}
+
+function SortableDivisionExerciseRow({
+  exercise,
+  methods,
+  allExercises,
+  userId,
+}: SortableRowProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: exercise.uuid })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  const dragHandle = (
+    <button
+      {...listeners}
+      {...attributes}
+      className="cursor-grab touch-none text-muted-foreground hover:text-foreground p-1 -ml-1 shrink-0"
+      tabIndex={-1}
+    >
+      <GripVertical className="h-4 w-4" />
+    </button>
+  )
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={isDragging ? "opacity-50 relative z-50" : ""}
+    >
+      <DivisionExerciseRow
+        exercise={exercise}
+        methods={methods}
+        allExercises={allExercises}
+        userId={userId}
+        dragHandle={dragHandle}
+      />
+    </div>
+  )
 }
 
 export function DivisionsAccordion({
@@ -31,9 +98,52 @@ export function DivisionsAccordion({
 }: DivisionsAccordionProps) {
   const [isPending, startTransition] = useTransition()
 
+  const [divisionExercises, setDivisionExercises] = useState<
+    Record<string, TrainingDivisionExercise[]>
+  >(() =>
+    Object.fromEntries(
+      training.divisions.map((d) => [
+        d.uuid,
+        [...d.exercises].sort((a, b) => a.order - b.order),
+      ])
+    )
+  )
+
+  useEffect(() => {
+    setDivisionExercises(
+      Object.fromEntries(
+        training.divisions.map((d) => [
+          d.uuid,
+          [...d.exercises].sort((a, b) => a.order - b.order),
+        ])
+      )
+    )
+  }, [training])
+
   function handleAddDivision() {
     startTransition(async () => {
       await addDivision(training.uuid, training.user_uuid, training.divisions.length)
+    })
+  }
+
+  function handleDragEnd(divisionUuid: string, event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    setDivisionExercises((prev) => {
+      const exercises = prev[divisionUuid] ?? []
+      const oldIndex = exercises.findIndex((e) => e.uuid === active.id)
+      const newIndex = exercises.findIndex((e) => e.uuid === over.id)
+      const reordered = arrayMove(exercises, oldIndex, newIndex)
+
+      startTransition(async () => {
+        await reorderExercises(
+          reordered.map((e, i) => ({ uuid: e.uuid, order: i })),
+          userId
+        )
+      })
+
+      return { ...prev, [divisionUuid]: reordered }
     })
   }
 
@@ -79,19 +189,27 @@ export function DivisionsAccordion({
                   Nenhum exercício nesta divisão
                 </p>
               ) : (
-                <div>
-                  {[...division.exercises]
-                    .sort((a, b) => a.order - b.order)
-                    .map((ex) => (
-                      <DivisionExerciseRow
-                        key={ex.uuid}
-                        exercise={ex}
-                        methods={methods}
-                        allExercises={allExercises}
-                        userId={userId}
-                      />
-                    ))}
-                </div>
+                <DndContext
+                  collisionDetection={closestCenter}
+                  onDragEnd={(event) => handleDragEnd(division.uuid, event)}
+                >
+                  <SortableContext
+                    items={(divisionExercises[division.uuid] ?? []).map((e) => e.uuid)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div>
+                      {(divisionExercises[division.uuid] ?? []).map((ex) => (
+                        <SortableDivisionExerciseRow
+                          key={ex.uuid}
+                          exercise={ex}
+                          methods={methods}
+                          allExercises={allExercises}
+                          userId={userId}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
               )}
             </AccordionContent>
           </AccordionItem>
