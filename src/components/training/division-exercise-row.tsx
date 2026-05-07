@@ -28,6 +28,7 @@ interface DivisionExerciseRowProps {
   methods: MethodRow[]
   allExercises: ExerciseRow[]
   userId: string
+  dragHandle?: React.ReactNode
 }
 
 export function DivisionExerciseRow({
@@ -35,6 +36,7 @@ export function DivisionExerciseRow({
   methods,
   allExercises,
   userId,
+  dragHandle,
 }: DivisionExerciseRowProps) {
   const [sets, setSets] = useState(exercise.sets)
   const [methodDialogOpen, setMethodDialogOpen] = useState(false)
@@ -76,6 +78,7 @@ export function DivisionExerciseRow({
 
   return (
     <div className="flex items-center gap-3 py-2.5 px-4 border-b border-border last:border-0 hover:bg-surface-lowest">
+      {dragHandle}
       <div className="h-10 w-14 shrink-0 overflow-hidden rounded-md bg-surface-highest">
         {thumbnail ? (
           <img

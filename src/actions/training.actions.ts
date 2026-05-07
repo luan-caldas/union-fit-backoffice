@@ -198,3 +198,19 @@ export async function swapExerciseInDivision(
   if (error) throw new Error("Erro ao trocar exercício.")
   revalidatePath(`/users/${userId}`)
 }
+
+export async function reorderExercises(
+  exercises: { uuid: string; order: number }[],
+  userId: string
+) {
+  const admin = await requireAdmin()
+  await Promise.all(
+    exercises.map(({ uuid, order }) =>
+      admin
+        .from("workout.training.division.exercise")
+        .update({ order })
+        .eq("uuid", uuid)
+    )
+  )
+  revalidatePath(`/users/${userId}`)
+}
