@@ -461,6 +461,87 @@ export type Database = {
           },
         ]
       }
+      "workout.cardio": {
+        Row: {
+          created_at: string
+          description: string | null
+          duration: number | null
+          name: string
+          order: number
+          user_uuid: string
+          uuid: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          name: string
+          order?: number
+          user_uuid: string
+          uuid?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration?: number | null
+          name?: string
+          order?: number
+          user_uuid?: string
+          uuid?: string
+        }
+        Relationships: []
+      }
+      "workout.cardio.exercise": {
+        Row: {
+          cardio_uuid: string
+          distance_meters: number | null
+          duration_seconds: number | null
+          exercise_uuid: string
+          incline_degrees: number | null
+          order: number
+          pace_max_seconds: number | null
+          pace_min_seconds: number | null
+          rpm_max: number | null
+          rpm_min: number | null
+          speed_max: number | null
+          speed_min: number | null
+          user_uuid: string
+          uuid: string
+        }
+        Insert: {
+          cardio_uuid: string
+          distance_meters?: number | null
+          duration_seconds?: number | null
+          exercise_uuid: string
+          incline_degrees?: number | null
+          order?: number
+          pace_max_seconds?: number | null
+          pace_min_seconds?: number | null
+          rpm_max?: number | null
+          rpm_min?: number | null
+          speed_max?: number | null
+          speed_min?: number | null
+          user_uuid: string
+          uuid?: string
+        }
+        Update: {
+          cardio_uuid?: string
+          distance_meters?: number | null
+          duration_seconds?: number | null
+          exercise_uuid?: string
+          incline_degrees?: number | null
+          order?: number
+          pace_max_seconds?: number | null
+          pace_min_seconds?: number | null
+          rpm_max?: number | null
+          rpm_min?: number | null
+          speed_max?: number | null
+          speed_min?: number | null
+          user_uuid?: string
+          uuid?: string
+        }
+        Relationships: []
+      }
       "workout.exercise": {
         Row: {
           description: string | null
