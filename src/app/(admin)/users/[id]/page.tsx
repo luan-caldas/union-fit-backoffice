@@ -7,8 +7,10 @@ import { UserTrainingSection } from "@/components/users/user-training-section"
 import { UserTrainingEmpty } from "@/components/users/user-training-empty"
 import { getUserById } from "@/actions/users.actions"
 import { getTrainingByUserId } from "@/actions/training.actions"
+import { getCardiosByUserId } from "@/actions/cardio.actions"
 import { getExercises } from "@/actions/exercises.actions"
 import { getMethods } from "@/actions/methods.actions"
+import { UserCardioSection } from "@/components/users/user-cardio-section"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
@@ -20,12 +22,13 @@ interface Props {
 export default async function UserDetailPage({ params }: Props) {
   const { id } = await params
 
-  const [{ user, infoWorkout, subscription }, training, allExercises, methods] =
+  const [{ user, infoWorkout, subscription }, training, allExercises, methods, cardios] =
     await Promise.all([
       getUserById(id),
       getTrainingByUserId(id),
       getExercises(),
       getMethods(),
+      getCardiosByUserId(id),
     ])
 
   if (!user) notFound()
@@ -67,6 +70,12 @@ export default async function UserDetailPage({ params }: Props) {
               <UserTrainingEmpty />
             )}
           </div>
+
+          <UserCardioSection
+            cardios={cardios}
+            allExercises={allExercises}
+            userId={id}
+          />
         </div>
       </main>
     </>
