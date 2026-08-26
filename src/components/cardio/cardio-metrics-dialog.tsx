@@ -148,6 +148,7 @@ function validate(form: FormState): {
 }
 
 const GRID_CLASS = {
+  1: "grid-cols-1",
   2: "grid-cols-2",
   3: "grid-cols-2 sm:grid-cols-3",
 } as const
@@ -158,7 +159,7 @@ function MetricBlock({
   children,
 }: {
   title: string
-  columns?: 2 | 3
+  columns?: 1 | 2 | 3
   children: React.ReactNode
 }) {
   return (
@@ -172,13 +173,13 @@ function MetricBlock({
 }
 
 function MetricField({
-  label,
+  label = "",
   placeholder,
   value,
   error,
   onChange,
 }: {
-  label: string
+  label?: string
   placeholder: string
   value: string
   error?: string
@@ -186,12 +187,47 @@ function MetricField({
 }) {
   return (
     <div className="space-y-1">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+      {label && <Label className="text-xs text-muted-foreground">{label}</Label>}
       <Input
         value={value}
         placeholder={placeholder}
         aria-invalid={Boolean(error)}
         onChange={(e) => onChange(e.target.value)}
+      />
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
+  )
+}
+
+function MinSecField({
+  label = "",
+  placeholder,
+  value,
+  error,
+  onChange,
+}: {
+  label?: string
+  placeholder: string
+  value: string
+  error?: string
+  onChange: (value: string) => void
+}) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 5)
+    if (digits.length === 0) { onChange(""); return }
+    if (digits.length <= 2) { onChange(digits); return }
+    onChange(digits.slice(0, -2) + ":" + digits.slice(-2))
+  }
+
+  return (
+    <div className="space-y-1">
+      {label && <Label className="text-xs text-muted-foreground">{label}</Label>}
+      <Input
+        value={value}
+        placeholder={placeholder}
+        inputMode="numeric"
+        aria-invalid={Boolean(error)}
+        onChange={handleChange}
       />
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
@@ -254,14 +290,14 @@ export function CardioMetricsDialog({
 
         <div className="space-y-4">
           <MetricBlock title="Pace (min/km)">
-            <MetricField
+            <MinSecField
               label="Mínimo"
               placeholder="5:00"
               value={form.paceMin}
               error={errors.paceMin}
               onChange={(v) => update("paceMin", v)}
             />
-            <MetricField
+            <MinSecField
               label="Máximo"
               placeholder="5:30"
               value={form.paceMax}
@@ -304,23 +340,26 @@ export function CardioMetricsDialog({
             />
           </MetricBlock>
 
-          <MetricBlock title="Tempo, distância e inclinação" columns={3}>
-            <MetricField
-              label="Tempo (mm:ss)"
-              placeholder="5:30"
+          <MetricBlock title="Tempo (mm:ss)" columns={1}>
+            <MinSecField
+              placeholder="30:00"
               value={form.duration}
               error={errors.duration}
               onChange={(v) => update("duration", v)}
             />
+          </MetricBlock>
+
+          <MetricBlock title="Distância (km)" columns={1}>
             <MetricField
-              label="Distância (km)"
               placeholder="2,5"
               value={form.distance}
               error={errors.distance}
               onChange={(v) => update("distance", v)}
             />
+          </MetricBlock>
+
+          <MetricBlock title="Inclinação (°)" columns={1}>
             <MetricField
-              label="Inclinação (°)"
               placeholder="3"
               value={form.incline}
               error={errors.incline}
