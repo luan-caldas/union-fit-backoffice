@@ -157,6 +157,7 @@ function SortableCardioItem({
             </p>
           ) : (
             <DndContext
+              id={`exercises-dnd-${cardio.uuid}`}
               collisionDetection={closestCenter}
               onDragEnd={(event) => onExerciseDragEnd(cardio.uuid, event)}
             >
@@ -265,6 +266,7 @@ export function CardiosAccordion({
         </div>
       ) : (
         <DndContext
+          id="cardios-dnd"
           collisionDetection={closestCenter}
           onDragEnd={handleCardioDragEnd}
         >
