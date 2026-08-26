@@ -359,7 +359,7 @@ export function CardioMetricsDialog({
             />
           </MetricBlock>
 
-          <MetricBlock title="Inclinação (°)" columns={1}>
+          <MetricBlock title="Inclinação (%)" columns={1}>
             <MetricField
               placeholder="3"
               value={form.incline}

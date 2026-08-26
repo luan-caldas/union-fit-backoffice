@@ -155,7 +155,7 @@ export function buildMetricBadges(metrics: CardioMetricColumns): MetricBadge[] {
     badges.push({
       key: "incline",
       label: "Inclinação",
-      value: `${formatDecimal(metrics.incline_degrees, 1)}°`,
+      value: `${formatDecimal(metrics.incline_degrees, 1)}%`,
     })
   }
 
