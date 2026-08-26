@@ -220,19 +220,17 @@ export function CardiosAccordion({
     const { active, over } = event
     if (!over || active.id === over.id) return
 
-    setCardios((prev) => {
-      const oldIndex = prev.findIndex((c) => c.uuid === active.id)
-      const newIndex = prev.findIndex((c) => c.uuid === over.id)
-      if (oldIndex === -1 || newIndex === -1) return prev
+    const oldIndex = cardios.findIndex((c) => c.uuid === active.id)
+    const newIndex = cardios.findIndex((c) => c.uuid === over.id)
+    if (oldIndex === -1 || newIndex === -1) return
 
-      const reordered = arrayMove(prev, oldIndex, newIndex)
-      startTransition(async () => {
-        await reorderCardios(
-          reordered.map((c, i) => ({ uuid: c.uuid, order: i })),
-          userId
-        )
-      })
-      return reordered
+    const reordered = arrayMove(cardios, oldIndex, newIndex)
+    setCardios(reordered)
+    startTransition(async () => {
+      await reorderCardios(
+        reordered.map((c, i) => ({ uuid: c.uuid, order: i })),
+        userId
+      )
     })
   }
 
@@ -240,20 +238,18 @@ export function CardiosAccordion({
     const { active, over } = event
     if (!over || active.id === over.id) return
 
-    setExercisesByCardio((prev) => {
-      const exercises = prev[cardioUuid] ?? []
-      const oldIndex = exercises.findIndex((e) => e.uuid === active.id)
-      const newIndex = exercises.findIndex((e) => e.uuid === over.id)
-      if (oldIndex === -1 || newIndex === -1) return prev
+    const exercises = exercisesByCardio[cardioUuid] ?? []
+    const oldIndex = exercises.findIndex((e) => e.uuid === active.id)
+    const newIndex = exercises.findIndex((e) => e.uuid === over.id)
+    if (oldIndex === -1 || newIndex === -1) return
 
-      const reordered = arrayMove(exercises, oldIndex, newIndex)
-      startTransition(async () => {
-        await reorderCardioExercises(
-          reordered.map((e, i) => ({ uuid: e.uuid, order: i })),
-          userId
-        )
-      })
-      return { ...prev, [cardioUuid]: reordered }
+    const reordered = arrayMove(exercises, oldIndex, newIndex)
+    setExercisesByCardio((prev) => ({ ...prev, [cardioUuid]: reordered }))
+    startTransition(async () => {
+      await reorderCardioExercises(
+        reordered.map((e, i) => ({ uuid: e.uuid, order: i })),
+        userId
+      )
     })
   }
 
