@@ -215,8 +215,8 @@ function MinSecField({
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const digits = e.target.value.replace(/\D/g, "").slice(0, 5)
     if (digits.length === 0) { onChange(""); return }
-    if (digits.length <= 2) { onChange(digits); return }
-    onChange(digits.slice(0, -2) + ":" + digits.slice(-2))
+    const padded = digits.padStart(Math.max(digits.length, 3), "0")
+    onChange(padded.slice(0, -2) + ":" + padded.slice(-2))
   }
 
   return (
