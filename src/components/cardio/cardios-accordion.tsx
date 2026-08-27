@@ -148,6 +148,7 @@ function SortableCardioItem({
             cardio={cardio}
             allExercises={allExercises}
             userUuid={userId}
+            exerciseCount={exercises.length}
           />
         </div>
         <AccordionContent className="p-0">

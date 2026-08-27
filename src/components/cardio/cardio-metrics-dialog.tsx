@@ -33,9 +33,10 @@ const MAX_WITHOUT_MIN = "Informe o mínimo antes do máximo"
 const MIN_GREATER = "O mínimo não pode ser maior que o máximo"
 const TOO_HIGH = "Valor muito alto"
 
-// Column limits: speed is numeric(5,2), incline is numeric(4,1)
+// Column limits: speed is numeric(5,2), incline is numeric(4,1), pace up to 99:59
 const MAX_SPEED = 999.99
 const MAX_INCLINE = 999.9
+const MAX_PACE_SECONDS = 5999
 
 type FormState = {
   paceMin: string
@@ -99,8 +100,8 @@ function validate(form: FormState): {
   metrics: CardioExerciseMetrics | null
   errors: FieldErrors
 } {
-  const paceMin = checkNumber(parseMinSec(form.paceMin), FORMAT_MIN_SEC)
-  const paceMax = checkNumber(parseMinSec(form.paceMax), FORMAT_MIN_SEC)
+  const paceMin = checkNumber(parseMinSec(form.paceMin), FORMAT_MIN_SEC, MAX_PACE_SECONDS)
+  const paceMax = checkNumber(parseMinSec(form.paceMax), FORMAT_MIN_SEC, MAX_PACE_SECONDS)
   const speedMin = checkNumber(parseDecimal(form.speedMin, 2), FORMAT_NUMBER, MAX_SPEED)
   const speedMax = checkNumber(parseDecimal(form.speedMax, 2), FORMAT_NUMBER, MAX_SPEED)
   const rpmMin = checkNumber(parseInteger(form.rpmMin), FORMAT_NUMBER)

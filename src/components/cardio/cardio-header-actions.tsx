@@ -25,12 +25,14 @@ interface CardioHeaderActionsProps {
   cardio: Cardio
   allExercises: ExerciseRow[]
   userUuid: string
+  exerciseCount: number
 }
 
 export function CardioHeaderActions({
   cardio,
   allExercises,
   userUuid,
+  exerciseCount,
 }: CardioHeaderActionsProps) {
   const [editOpen, setEditOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
@@ -69,7 +71,7 @@ export function CardioHeaderActions({
   }
 
   function handleAddExercise(exercise: ExerciseRow) {
-    const nextOrder = cardio.exercises.length
+    const nextOrder = exerciseCount
     startTransition(async () => {
       await addExerciseToCardio(cardio.uuid, exercise.uuid, userUuid, nextOrder)
     })

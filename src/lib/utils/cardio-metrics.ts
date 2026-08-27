@@ -1,14 +1,6 @@
-export type CardioMetricColumns = {
-  pace_min_seconds: number | null
-  pace_max_seconds: number | null
-  speed_min: number | null
-  speed_max: number | null
-  rpm_min: number | null
-  rpm_max: number | null
-  duration_seconds: number | null
-  distance_meters: number | null
-  incline_degrees: number | null
-}
+import type { CardioExerciseMetrics } from "@/actions/cardio.actions"
+
+export type CardioMetricColumns = CardioExerciseMetrics
 
 export type MetricBadge = {
   key: string

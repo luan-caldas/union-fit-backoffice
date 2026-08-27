@@ -13,6 +13,7 @@ export type CardioExerciseMetrics = {
   rpm_max: number | null
   duration_seconds: number | null
   distance_meters: number | null
+  /** Stored as percentage (%), not degrees. Column name kept for DB compatibility. */
   incline_degrees: number | null
 }
 
@@ -139,10 +140,12 @@ export async function updateCardio(
 export async function deleteCardio(cardioUuid: string, userId: string) {
   const admin = await requireAdmin()
 
-  await admin
+  const { error: exercisesError } = await admin
     .from("workout.cardio.exercise")
     .delete()
     .eq("cardio_uuid", cardioUuid)
+
+  if (exercisesError) throw new Error("Erro ao excluir exercícios do treino de cardio.")
 
   const { error } = await admin
     .from("workout.cardio")
@@ -158,11 +161,12 @@ export async function reorderCardios(
   userId: string
 ) {
   const admin = await requireAdmin()
-  await Promise.all(
+  const results = await Promise.all(
     cardios.map(({ uuid, order }) =>
       admin.from("workout.cardio").update({ order }).eq("uuid", uuid)
     )
   )
+  if (results.some((r) => r.error)) throw new Error("Erro ao reordenar treinos de cardio.")
   revalidatePath(`/users/${userId}`)
 }
 
@@ -233,10 +237,11 @@ export async function reorderCardioExercises(
   userId: string
 ) {
   const admin = await requireAdmin()
-  await Promise.all(
+  const results = await Promise.all(
     exercises.map(({ uuid, order }) =>
       admin.from("workout.cardio.exercise").update({ order }).eq("uuid", uuid)
     )
   )
+  if (results.some((r) => r.error)) throw new Error("Erro ao reordenar exercícios de cardio.")
   revalidatePath(`/users/${userId}`)
 }
