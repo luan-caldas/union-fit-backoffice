@@ -1,6 +1,7 @@
 "use server"
 
 import { requireAdmin } from "@/lib/auth/require-admin"
+import { fetchAll } from "@/lib/supabase/fetch-all"
 import { revalidatePath } from "next/cache"
 import type { Database } from "@/lib/supabase/database.types"
 
@@ -15,13 +16,17 @@ export type MethodRow = {
 
 export async function getMethods(): Promise<MethodRow[]> {
   const admin = await requireAdmin()
-  const { data, error } = await admin
-    .from("workout.method")
-    .select("*")
-    .order("name")
+  const { data, error } = await fetchAll((from, to) =>
+    admin
+      .from("workout.method")
+      .select("*")
+      .order("name")
+      .order("uuid")
+      .range(from, to)
+  )
 
   if (error) throw new Error("Erro ao carregar métodos.")
-  return data ?? []
+  return data
 }
 
 export async function deleteMethod(uuid: string) {

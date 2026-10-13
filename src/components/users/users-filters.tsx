@@ -1,28 +1,14 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Search } from "lucide-react"
 
 interface UsersFiltersProps {
   search: string
   onSearchChange: (value: string) => void
-  subscriptionFilter: string
-  onSubscriptionFilterChange: (value: string) => void
 }
 
-export function UsersFilters({
-  search,
-  onSearchChange,
-  subscriptionFilter,
-  onSubscriptionFilterChange,
-}: UsersFiltersProps) {
+export function UsersFilters({ search, onSearchChange }: UsersFiltersProps) {
   return (
     <div className="flex gap-3">
       <div className="relative flex-1 max-w-sm">
@@ -34,16 +20,6 @@ export function UsersFilters({
           className="pl-9"
         />
       </div>
-      <Select value={subscriptionFilter} onValueChange={(v) => onSubscriptionFilterChange(v ?? "all")}>
-        <SelectTrigger className="w-44">
-          <SelectValue placeholder="Assinatura" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Todos</SelectItem>
-          <SelectItem value="active">Ativo</SelectItem>
-          <SelectItem value="inactive">Inativo</SelectItem>
-        </SelectContent>
-      </Select>
     </div>
   )
 }
