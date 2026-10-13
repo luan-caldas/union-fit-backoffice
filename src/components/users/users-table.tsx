@@ -1,8 +1,7 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import Fuse from "fuse.js"
 import {
   Table,
   TableBody,
@@ -12,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { UsersFilters } from "./users-filters"
@@ -28,46 +28,39 @@ function isSubscriptionActive(
   return true
 }
 
+const PAGE_SIZE = 50
+
 export function UsersTable() {
   const router = useRouter()
-  const { data: users = [], isLoading } = useUsers()
   const [search, setSearch] = useState("")
-  const [subscriptionFilter, setSubscriptionFilter] = useState("all")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [page, setPage] = useState(1)
 
-  const fuse = useMemo(
-    () =>
-      new Fuse(users, {
-        keys: ["name", "email", "id"],
-        threshold: 0.3,
-        ignoreLocation: true,
-      }),
-    [users]
-  )
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(search.trim())
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(t)
+  }, [search])
 
-  const filtered = useMemo(() => {
-    let result: UserWithSubscription[] = search
-      ? fuse.search(search).map((r) => r.item)
-      : users
+  const { data, isLoading, isFetching } = useUsers({
+    page,
+    pageSize: PAGE_SIZE,
+    search: debouncedSearch,
+  })
 
-    if (subscriptionFilter === "active") {
-      result = result.filter((u) => isSubscriptionActive(u.user_subscriptions))
-    } else if (subscriptionFilter === "inactive") {
-      result = result.filter((u) => !isSubscriptionActive(u.user_subscriptions))
-    }
-
-    return result
-  }, [search, subscriptionFilter, users, fuse])
+  const users = data?.users ?? []
+  const total = data?.total ?? 0
+  const totalPages = Math.max(Math.ceil(total / PAGE_SIZE), 1)
 
   return (
     <div className="space-y-4">
-      <UsersFilters
-        search={search}
-        onSearchChange={setSearch}
-        subscriptionFilter={subscriptionFilter}
-        onSubscriptionFilterChange={setSubscriptionFilter}
-      />
+      <UsersFilters search={search} onSearchChange={setSearch} />
 
-      <div className="rounded-lg border border-border bg-white overflow-hidden">
+      <div
+        className={`rounded-lg border border-border bg-white overflow-hidden ${isFetching && !isLoading ? "opacity-60" : ""}`}
+      >
         <Table>
           <TableHeader>
             <TableRow>
@@ -89,14 +82,14 @@ export function UsersTable() {
                   <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
                 </TableRow>
               ))
-            ) : filtered.length === 0 ? (
+            ) : users.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
                   Nenhum usuário encontrado
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((user) => {
+              users.map((user) => {
                 const active = isSubscriptionActive(user.user_subscriptions)
                 return (
                   <TableRow
@@ -138,9 +131,32 @@ export function UsersTable() {
       </div>
 
       {!isLoading && (
-        <p className="text-xs text-muted-foreground">
-          {filtered.length} usuário{filtered.length !== 1 ? "s" : ""}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            {total} usuário{total !== 1 ? "s" : ""}
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">
+              Página {Math.min(page, totalPages)} de {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              Anterior
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Próxima
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   )

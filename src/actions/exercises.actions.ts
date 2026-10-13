@@ -1,6 +1,7 @@
 "use server"
 
 import { requireAdmin } from "@/lib/auth/require-admin"
+import { fetchAll } from "@/lib/supabase/fetch-all"
 import { revalidatePath } from "next/cache"
 import { getYouTubeThumbnail } from "@/lib/utils/youtube"
 import type { Database } from "@/lib/supabase/database.types"
@@ -19,13 +20,17 @@ export type ExerciseRow = {
 
 export async function getExercises(): Promise<ExerciseRow[]> {
   const admin = await requireAdmin()
-  const { data, error } = await admin
-    .from("workout.exercise")
-    .select("*")
-    .order("name")
+  const { data, error } = await fetchAll((from, to) =>
+    admin
+      .from("workout.exercise")
+      .select("*")
+      .order("name")
+      .order("uuid")
+      .range(from, to)
+  )
 
   if (error) throw new Error("Erro ao carregar exercícios.")
-  return data ?? []
+  return data
 }
 
 export async function upsertExercise(payload: {

@@ -1,6 +1,7 @@
 "use server"
 
 import { requireAdmin } from "@/lib/auth/require-admin"
+import { fetchAll } from "@/lib/supabase/fetch-all"
 import { revalidatePath } from "next/cache"
 
 export type PeriodizationDetail = {
@@ -23,11 +24,21 @@ export async function getPeriodizations(): Promise<PeriodizationWithLevel[]> {
   const admin = await requireAdmin()
 
   const [periodsResult, detailsResult, levelsResult] = await Promise.all([
-    admin.from("workout.periodization").select("uuid, level_uuid"),
-    admin
-      .from("workout.periodization.details")
-      .select("*")
-      .order("order"),
+    fetchAll((from, to) =>
+      admin
+        .from("workout.periodization")
+        .select("uuid, level_uuid")
+        .order("uuid")
+        .range(from, to)
+    ),
+    fetchAll((from, to) =>
+      admin
+        .from("workout.periodization.details")
+        .select("*")
+        .order("order")
+        .order("uuid")
+        .range(from, to)
+    ),
     admin
       .from("info_workout.level")
       .select("uuid, title, level_enum")
@@ -39,9 +50,9 @@ export async function getPeriodizations(): Promise<PeriodizationWithLevel[]> {
   if (levelsResult.error) throw new Error("Erro ao carregar níveis.")
 
   const levels = levelsResult.data ?? []
-  const details = detailsResult.data ?? []
+  const details = detailsResult.data
 
-  return (periodsResult.data ?? []).map((p) => {
+  return periodsResult.data.map((p) => {
     const level = levels.find((l) => l.uuid === p.level_uuid)
     return {
       uuid: p.uuid,

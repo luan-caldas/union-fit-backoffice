@@ -42,30 +42,76 @@ export type ApiTraining = {
   divisions: Json | null
 }
 
-export async function getUsers(): Promise<UserWithSubscription[]> {
+export type UsersPage = {
+  users: UserWithSubscription[]
+  total: number
+}
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+// Valor seguro para dentro de `or(...)` do PostgREST: escapa curingas do LIKE
+// e depois aspas/barras da sintaxe de string entre aspas duplas.
+function toIlikePattern(term: string) {
+  const likeEscaped = term.replace(/[\\%_]/g, "\\$&")
+  const quoted = likeEscaped.replace(/[\\"]/g, "\\$&")
+  return `"%${quoted}%"`
+}
+
+export async function getUsers(params: {
+  page: number
+  pageSize: number
+  search?: string
+}): Promise<UsersPage> {
   const admin = await requireAdmin()
 
-  const [usersResult, subsResult] = await Promise.all([
-    admin
-      .from("user")
-      .select("id, name, email, image_profile, deleted_at")
-      .is("deleted_at", null)
-      .order("name"),
-    admin
-      .from("user_subscriptions")
-      .select("user_id, is_active, expiration_at, entitlement_id, last_event_type, last_event_at"),
-  ])
+  const pageSize = Math.min(Math.max(Math.floor(params.pageSize), 1), 100)
+  const page = Math.max(Math.floor(params.page), 1)
+  const from = (page - 1) * pageSize
+  const search = params.search?.trim()
+
+  let query = admin
+    .from("user")
+    .select("id, name, email, image_profile, deleted_at", { count: "exact" })
+    .is("deleted_at", null)
+
+  if (search) {
+    const pattern = toIlikePattern(search)
+    const filters = [`name.ilike.${pattern}`, `email.ilike.${pattern}`]
+    if (UUID_RE.test(search)) filters.push(`id.eq.${search}`)
+    query = query.or(filters.join(","))
+  }
+
+  const usersResult = await query
+    .order("name")
+    .order("id")
+    .range(from, from + pageSize - 1)
 
   if (usersResult.error) throw new Error("Erro ao carregar usuários.")
 
-  const subsMap = new Map(
-    (subsResult.data ?? []).map((s) => [s.user_id, s])
-  )
+  const users = usersResult.data ?? []
+  const ids = users.map((u) => u.id)
 
-  return (usersResult.data ?? []).map((u) => ({
-    ...u,
-    user_subscriptions: subsMap.get(u.id) ?? null,
-  }))
+  const subsResult = ids.length
+    ? await admin
+        .from("user_subscriptions")
+        .select(
+          "user_id, is_active, expiration_at, entitlement_id, last_event_type, last_event_at"
+        )
+        .in("user_id", ids)
+    : { data: [], error: null }
+
+  if (subsResult.error) throw new Error("Erro ao carregar assinaturas.")
+
+  const subsMap = new Map((subsResult.data ?? []).map((s) => [s.user_id, s]))
+
+  return {
+    total: usersResult.count ?? 0,
+    users: users.map((u) => ({
+      ...u,
+      user_subscriptions: subsMap.get(u.id) ?? null,
+    })),
+  }
 }
 
 export async function getUserById(id: string) {
