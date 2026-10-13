@@ -491,6 +491,105 @@ export type Database = {
         }
         Relationships: []
       }
+      "workout.session": {
+        Row: {
+          auto_finished: boolean
+          completion_percentage: number
+          created_at: string
+          division_name: string
+          division_uuid: string
+          finished_at: string
+          is_deleted: boolean
+          started_at: string
+          training_uuid: string | null
+          updated_at: string
+          user_uuid: string
+          uuid: string
+          workout_type: string
+        }
+        Insert: {
+          auto_finished?: boolean
+          completion_percentage: number
+          created_at?: string
+          division_name: string
+          division_uuid: string
+          finished_at: string
+          is_deleted?: boolean
+          started_at: string
+          training_uuid?: string | null
+          updated_at?: string
+          user_uuid: string
+          uuid?: string
+          workout_type: string
+        }
+        Update: {
+          auto_finished?: boolean
+          completion_percentage?: number
+          created_at?: string
+          division_name?: string
+          division_uuid?: string
+          finished_at?: string
+          is_deleted?: boolean
+          started_at?: string
+          training_uuid?: string | null
+          updated_at?: string
+          user_uuid?: string
+          uuid?: string
+          workout_type?: string
+        }
+        Relationships: []
+      }
+      "workout.session.exercise": {
+        Row: {
+          completed_at: string
+          created_at: string
+          exercise_order: number
+          exercise_uuid: string
+          input_unit: Database["public"]["Enums"]["WeightType"] | null
+          instance_uuid: string
+          method_uuid: string | null
+          session_uuid: string
+          sets_done: number | null
+          sets_planned: number | null
+          user_uuid: string
+          uuid: string
+          weight_kilograms: number | null
+          weight_pounds: number | null
+        }
+        Insert: {
+          completed_at: string
+          created_at?: string
+          exercise_order: number
+          exercise_uuid: string
+          input_unit?: Database["public"]["Enums"]["WeightType"] | null
+          instance_uuid: string
+          method_uuid?: string | null
+          session_uuid: string
+          sets_done?: number | null
+          sets_planned?: number | null
+          user_uuid: string
+          uuid?: string
+          weight_kilograms?: number | null
+          weight_pounds?: number | null
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          exercise_order?: number
+          exercise_uuid?: string
+          input_unit?: Database["public"]["Enums"]["WeightType"] | null
+          instance_uuid?: string
+          method_uuid?: string | null
+          session_uuid?: string
+          sets_done?: number | null
+          sets_planned?: number | null
+          user_uuid?: string
+          uuid?: string
+          weight_kilograms?: number | null
+          weight_pounds?: number | null
+        }
+        Relationships: []
+      }
       "workout.cardio.exercise": {
         Row: {
           cardio_uuid: string

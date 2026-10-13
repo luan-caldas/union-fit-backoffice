@@ -11,6 +11,7 @@ import { getCardiosByUserId } from "@/actions/cardio.actions"
 import { getExercises } from "@/actions/exercises.actions"
 import { getMethods } from "@/actions/methods.actions"
 import { UserCardioSection } from "@/components/users/user-cardio-section"
+import { UserWorkoutHistorySection } from "@/components/users/user-workout-history-section"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
@@ -76,6 +77,8 @@ export default async function UserDetailPage({ params }: Props) {
             allExercises={allExercises}
             userId={id}
           />
+
+          <UserWorkoutHistorySection userId={id} />
         </div>
       </main>
     </>
