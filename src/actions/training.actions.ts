@@ -71,12 +71,19 @@ export async function getTrainingByUserId(userId: string): Promise<TrainingData 
   }
 }
 
+function assertValidDuration(duration: unknown) {
+  if (!Number.isInteger(duration) || (duration as number) <= 0) {
+    throw new Error("Informe a duração (em minutos).")
+  }
+}
+
 export async function updateDivision(
   divisionUuid: string,
-  payload: { name?: string; description?: string; duration?: number | null },
+  payload: { name?: string; description?: string; duration: number },
   userId: string
 ) {
   const admin = await requireAdmin()
+  assertValidDuration(payload.duration)
   const { error } = await admin
     .from("workout.training.division")
     .update(payload)
@@ -106,13 +113,20 @@ export async function deleteDivision(divisionUuid: string, userId: string) {
 export async function addDivision(
   workoutUuid: string,
   userUuid: string,
-  order: number
+  order: number,
+  payload: { name: string; description?: string; duration: number }
 ) {
   const admin = await requireAdmin()
+  assertValidDuration(payload.duration)
+  const name = payload.name.trim()
+  if (!name) throw new Error("Informe o nome da divisão.")
+
   const { error } = await admin.from("workout.training.division").insert({
     workout_uuid: workoutUuid,
     user_uuid: userUuid,
-    name: `Treino ${String.fromCharCode(65 + order)}`,
+    name,
+    description: payload.description?.trim() || null,
+    duration: payload.duration,
     order,
   })
   if (error) throw new Error("Erro ao adicionar divisão.")

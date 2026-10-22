@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { DivisionExerciseRow } from "./division-exercise-row"
 import { DivisionHeaderActions } from "./division-header-form"
+import { DivisionFormDialog, type DivisionFormValues } from "./division-form-dialog"
 import { addDivision, reorderExercises } from "@/actions/training.actions"
 import type { TrainingData, TrainingDivisionExercise } from "@/actions/training.actions"
 import type { MethodRow } from "@/actions/methods.actions"
@@ -97,6 +98,7 @@ export function DivisionsAccordion({
   userId,
 }: DivisionsAccordionProps) {
   const [isPending, startTransition] = useTransition()
+  const [addOpen, setAddOpen] = useState(false)
 
   const [divisionExercises, setDivisionExercises] = useState<
     Record<string, TrainingDivisionExercise[]>
@@ -120,9 +122,14 @@ export function DivisionsAccordion({
     )
   }, [training])
 
-  function handleAddDivision() {
+  function handleAddDivision(values: DivisionFormValues) {
     startTransition(async () => {
-      await addDivision(training.uuid, training.user_uuid, training.divisions.length)
+      await addDivision(training.uuid, training.user_uuid, training.divisions.length, {
+        name: values.name,
+        description: values.description,
+        duration: values.duration,
+      })
+      setAddOpen(false)
     })
   }
 
@@ -219,13 +226,25 @@ export function DivisionsAccordion({
       <Button
         variant="outline"
         size="sm"
-        onClick={handleAddDivision}
+        onClick={() => setAddOpen(true)}
         disabled={isPending}
         className="gap-1.5"
       >
         <Plus className="h-3.5 w-3.5" />
         Adicionar divisão
       </Button>
+      <DivisionFormDialog
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        title="Nova Divisão"
+        initialValues={{
+          name: `Treino ${String.fromCharCode(65 + training.divisions.length)}`,
+          description: "",
+          duration: "",
+        }}
+        isPending={isPending}
+        onSubmit={handleAddDivision}
+      />
     </div>
   )
 }
