@@ -2,9 +2,9 @@
 
 import { useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
-import { updateDivision, deleteDivision } from "@/actions/training.actions"
+import { updateDivision, deleteDivision, duplicateDivision } from "@/actions/training.actions"
 import type { TrainingDivision } from "@/actions/training.actions"
-import { Pencil, Trash2, Plus } from "lucide-react"
+import { Pencil, Trash2, Plus, Copy } from "lucide-react"
 import { addExerciseToDivision } from "@/actions/training.actions"
 import type { ExerciseRow } from "@/actions/exercises.actions"
 import { ExercisePickerDialog } from "./exercise-picker-dialog"
@@ -37,6 +37,12 @@ export function DivisionHeaderActions({
         userUuid
       )
       setEditOpen(false)
+    })
+  }
+
+  function handleDuplicate() {
+    startTransition(async () => {
+      await duplicateDivision(division.uuid, userUuid)
     })
   }
 
@@ -76,6 +82,16 @@ export function DivisionHeaderActions({
           title="Editar divisão"
         >
           <Pencil className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-muted-foreground"
+          onClick={(e) => { e.stopPropagation(); handleDuplicate() }}
+          disabled={isPending}
+          title="Duplicar divisão"
+        >
+          <Copy className="h-3.5 w-3.5" />
         </Button>
         <Button
           variant="ghost"

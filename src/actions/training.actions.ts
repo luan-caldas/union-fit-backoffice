@@ -133,6 +133,67 @@ export async function addDivision(
   revalidatePath(`/users/${userUuid}`)
 }
 
+export async function duplicateDivision(divisionUuid: string, userId: string) {
+  const admin = await requireAdmin()
+
+  const { data: source, error: sourceError } = await admin
+    .from("workout.training.division")
+    .select("*")
+    .eq("uuid", divisionUuid)
+    .single()
+  if (sourceError || !source) throw new Error("Divisão não encontrada.")
+
+  const { count } = await admin
+    .from("workout.training.division")
+    .select("uuid", { count: "exact", head: true })
+    .eq("workout_uuid", source.workout_uuid)
+
+  const { data: copy, error: copyError } = await admin
+    .from("workout.training.division")
+    .insert({
+      workout_uuid: source.workout_uuid,
+      user_uuid: source.user_uuid,
+      name: `${source.name ?? "Treino"} (cópia)`,
+      description: source.description,
+      duration: source.duration,
+      order: count ?? 0,
+    })
+    .select("uuid")
+    .single()
+  if (copyError || !copy) throw new Error("Erro ao duplicar divisão.")
+
+  const { data: exercises, error: exercisesError } = await admin
+    .from("workout.training.division.exercise")
+    .select("*")
+    .eq("division_uuid", divisionUuid)
+    .order("order")
+  if (exercisesError) {
+    await admin.from("workout.training.division").delete().eq("uuid", copy.uuid)
+    throw new Error("Erro ao duplicar exercícios da divisão.")
+  }
+
+  if (exercises && exercises.length > 0) {
+    const { error: insertError } = await admin
+      .from("workout.training.division.exercise")
+      .insert(
+        exercises.map((e) => ({
+          division_uuid: copy.uuid,
+          exercise_uuid: e.exercise_uuid,
+          user_uuid: e.user_uuid,
+          method_uuid: e.method_uuid,
+          sets: e.sets,
+          order: e.order,
+        }))
+      )
+    if (insertError) {
+      await admin.from("workout.training.division").delete().eq("uuid", copy.uuid)
+      throw new Error("Erro ao duplicar exercícios da divisão.")
+    }
+  }
+
+  revalidatePath(`/users/${userId}`)
+}
+
 export async function updateExerciseSets(
   exerciseUuid: string,
   sets: number,
