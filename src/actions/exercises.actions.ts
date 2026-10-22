@@ -44,6 +44,7 @@ export async function upsertExercise(payload: {
   video_url?: string | null
 }) {
   const admin = await requireAdmin()
+  if (!payload.level_uuid?.length) throw new Error("Selecione ao menos um nível.")
   const image_url = getYouTubeThumbnail(payload.video_url)
 
   const { error } = await admin.from("workout.exercise").upsert({
