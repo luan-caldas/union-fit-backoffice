@@ -40,7 +40,7 @@ const schema = z.object({
   description: z.string().optional(),
   muscle: z.string().min(1, "Músculo obrigatório"),
   repetition_type: z.enum(["PERIODIZATION", "ISOMETRIC"]),
-  level_uuid: z.array(z.string()),
+  level_uuid: z.array(z.string()).min(1, "Selecione ao menos um nível"),
   methods_support_uuid: z.array(z.string()),
   video_url: z.string().optional(),
 })
@@ -145,7 +145,8 @@ export function ExerciseFormDialog({
     const current = selectedLevels
     setValue(
       "level_uuid",
-      current.includes(uuid) ? current.filter((id) => id !== uuid) : [...current, uuid]
+      current.includes(uuid) ? current.filter((id) => id !== uuid) : [...current, uuid],
+      { shouldValidate: true }
     )
   }
 
@@ -227,7 +228,7 @@ export function ExerciseFormDialog({
           </div>
 
           <div className="space-y-1">
-            <Label>Níveis</Label>
+            <Label>Níveis *</Label>
             <div className="flex flex-wrap gap-1.5">
               {levels.map((level) => (
                 <Badge
@@ -240,6 +241,9 @@ export function ExerciseFormDialog({
                 </Badge>
               ))}
             </div>
+            {errors.level_uuid && (
+              <p className="text-xs text-destructive">{errors.level_uuid.message}</p>
+            )}
           </div>
 
           <div className="space-y-1">
