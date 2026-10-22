@@ -15,11 +15,12 @@ import { ExercisePickerDialog } from "@/components/training/exercise-picker-dial
 import {
   addExerciseToCardio,
   deleteCardio,
+  duplicateCardio,
   updateCardio,
 } from "@/actions/cardio.actions"
 import type { Cardio } from "@/actions/cardio.actions"
 import type { ExerciseRow } from "@/actions/exercises.actions"
-import { Pencil, Plus, Trash2 } from "lucide-react"
+import { Copy, Pencil, Plus, Trash2 } from "lucide-react"
 
 interface CardioHeaderActionsProps {
   cardio: Cardio
@@ -70,6 +71,12 @@ export function CardioHeaderActions({
     })
   }
 
+  function handleDuplicate() {
+    startTransition(async () => {
+      await duplicateCardio(cardio.uuid, userUuid)
+    })
+  }
+
   function handleAddExercise(exercise: ExerciseRow) {
     const nextOrder = exerciseCount
     startTransition(async () => {
@@ -108,6 +115,19 @@ export function CardioHeaderActions({
           title="Editar treino de cardio"
         >
           <Pencil className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-muted-foreground"
+          onClick={(e) => {
+            e.stopPropagation()
+            handleDuplicate()
+          }}
+          disabled={isPending}
+          title="Duplicar treino de cardio"
+        >
+          <Copy className="h-3.5 w-3.5" />
         </Button>
         <Button
           variant="ghost"

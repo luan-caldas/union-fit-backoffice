@@ -137,6 +137,71 @@ export async function updateCardio(
   revalidatePath(`/users/${userId}`)
 }
 
+export async function duplicateCardio(cardioUuid: string, userId: string) {
+  const admin = await requireAdmin()
+
+  const { data: source, error: sourceError } = await admin
+    .from("workout.cardio")
+    .select("*")
+    .eq("uuid", cardioUuid)
+    .single()
+  if (sourceError || !source) throw new Error("Treino de cardio não encontrado.")
+
+  const { count } = await admin
+    .from("workout.cardio")
+    .select("uuid", { count: "exact", head: true })
+    .eq("user_uuid", source.user_uuid)
+
+  const { data: copy, error: copyError } = await admin
+    .from("workout.cardio")
+    .insert({
+      user_uuid: source.user_uuid,
+      name: `${source.name} (cópia)`,
+      description: source.description,
+      duration: source.duration,
+      order: count ?? 0,
+    })
+    .select("uuid")
+    .single()
+  if (copyError || !copy) throw new Error("Erro ao duplicar treino de cardio.")
+
+  const { data: exercises, error: exercisesError } = await admin
+    .from("workout.cardio.exercise")
+    .select("*")
+    .eq("cardio_uuid", cardioUuid)
+    .order("order")
+  if (exercisesError) {
+    await admin.from("workout.cardio").delete().eq("uuid", copy.uuid)
+    throw new Error("Erro ao duplicar exercícios do treino de cardio.")
+  }
+
+  if (exercises && exercises.length > 0) {
+    const { error: insertError } = await admin.from("workout.cardio.exercise").insert(
+      exercises.map((e) => ({
+        cardio_uuid: copy.uuid,
+        user_uuid: e.user_uuid,
+        exercise_uuid: e.exercise_uuid,
+        order: e.order,
+        distance_meters: e.distance_meters,
+        duration_seconds: e.duration_seconds,
+        incline_degrees: e.incline_degrees,
+        pace_max_seconds: e.pace_max_seconds,
+        pace_min_seconds: e.pace_min_seconds,
+        rpm_max: e.rpm_max,
+        rpm_min: e.rpm_min,
+        speed_max: e.speed_max,
+        speed_min: e.speed_min,
+      }))
+    )
+    if (insertError) {
+      await admin.from("workout.cardio").delete().eq("uuid", copy.uuid)
+      throw new Error("Erro ao duplicar exercícios do treino de cardio.")
+    }
+  }
+
+  revalidatePath(`/users/${userId}`)
+}
+
 export async function deleteCardio(cardioUuid: string, userId: string) {
   const admin = await requireAdmin()
 
