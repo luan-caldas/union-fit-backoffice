@@ -539,6 +539,36 @@ export type Database = {
         }
         Relationships: []
       }
+      "workout.session.feedback": {
+        Row: {
+          answer: string
+          answered_at: string
+          created_at: string
+          question: string
+          session_uuid: string
+          user_uuid: string
+          uuid: string
+        }
+        Insert: {
+          answer: string
+          answered_at: string
+          created_at?: string
+          question: string
+          session_uuid: string
+          user_uuid: string
+          uuid?: string
+        }
+        Update: {
+          answer?: string
+          answered_at?: string
+          created_at?: string
+          question?: string
+          session_uuid?: string
+          user_uuid?: string
+          uuid?: string
+        }
+        Relationships: []
+      }
       "workout.session.exercise": {
         Row: {
           completed_at: string
@@ -794,6 +824,36 @@ export type Database = {
             referencedColumns: ["uuid"]
           },
         ]
+      }
+      "workout.training.feedback": {
+        Row: {
+          answer: string
+          answered_at: string
+          created_at: string
+          question: string
+          training_uuid: string
+          user_uuid: string
+          uuid: string
+        }
+        Insert: {
+          answer: string
+          answered_at: string
+          created_at?: string
+          question: string
+          training_uuid: string
+          user_uuid: string
+          uuid?: string
+        }
+        Update: {
+          answer?: string
+          answered_at?: string
+          created_at?: string
+          question?: string
+          training_uuid?: string
+          user_uuid?: string
+          uuid?: string
+        }
+        Relationships: []
       }
       "workout.training": {
         Row: {

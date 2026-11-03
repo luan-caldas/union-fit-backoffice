@@ -16,6 +16,7 @@ export type WorkoutSession = {
   finished_at: string
   completion_percentage: number
   auto_finished: boolean
+  feedback: { question: string; answer: string }[]
 }
 
 export type WorkoutSessionsPage = {
@@ -78,8 +79,31 @@ export async function getWorkoutSessions(
 
   const rows = data ?? []
   const hasMore = rows.length > SESSIONS_PAGE_SIZE
-  const sessions = hasMore ? rows.slice(0, SESSIONS_PAGE_SIZE) : rows
-  const last = sessions[sessions.length - 1]
+  const pageRows = hasMore ? rows.slice(0, SESSIONS_PAGE_SIZE) : rows
+  const last = pageRows[pageRows.length - 1]
+
+  const feedbackBySession = new Map<string, { question: string; answer: string }[]>()
+  if (pageRows.length) {
+    const { data: feedback, error: feedbackError } = await admin
+      .from("workout.session.feedback")
+      .select("session_uuid, question, answer")
+      .in(
+        "session_uuid",
+        pageRows.map((r) => r.uuid)
+      )
+    // Feedback é complementar: se a tabela não existir no ambiente, segue sem ele.
+    if (!feedbackError) {
+      for (const f of feedback ?? []) {
+        const list = feedbackBySession.get(f.session_uuid) ?? []
+        list.push({ question: f.question, answer: f.answer })
+        feedbackBySession.set(f.session_uuid, list)
+      }
+    }
+  }
+  const sessions = pageRows.map((r) => ({
+    ...r,
+    feedback: feedbackBySession.get(r.uuid) ?? [],
+  }))
 
   return {
     sessions,

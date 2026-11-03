@@ -12,6 +12,8 @@ import { getExercises } from "@/actions/exercises.actions"
 import { getMethods } from "@/actions/methods.actions"
 import { UserCardioSection } from "@/components/users/user-cardio-section"
 import { UserWorkoutHistorySection } from "@/components/users/user-workout-history-section"
+import { UserSessionFeedbackChart } from "@/components/users/user-session-feedback-chart"
+import { UserCycleFeedbackHistory } from "@/components/users/user-cycle-feedback-history"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
@@ -78,7 +80,11 @@ export default async function UserDetailPage({ params }: Props) {
             userId={id}
           />
 
+          <UserSessionFeedbackChart userId={id} />
+
           <UserWorkoutHistorySection userId={id} />
+
+          <UserCycleFeedbackHistory userId={id} />
         </div>
       </main>
     </>
