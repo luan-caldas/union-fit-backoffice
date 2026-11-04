@@ -22,6 +22,11 @@ import {
   useWorkoutSessionExercises,
   useWorkoutSessions,
 } from "@/hooks/use-workout-sessions"
+import {
+  SESSION_FEEDBACK,
+  answerLabel,
+  questionLabel,
+} from "@/lib/constants/feedback"
 import { formatDateTime, formatDuration, formatTime } from "@/lib/utils/format"
 import type {
   WorkoutSession,
@@ -102,6 +107,24 @@ function SessionExercises({ sessionUuid }: { sessionUuid: string }) {
   )
 }
 
+function SessionFeedback({ session }: { session: WorkoutSession }) {
+  if (session.workout_type === "cardio" || session.feedback.length === 0) return null
+  return (
+    <div className="mb-3 space-y-1 border-b border-border pb-3 text-sm">
+      {session.feedback.map((f) => (
+        <p key={f.question}>
+          <span className="text-muted-foreground">
+            {questionLabel(SESSION_FEEDBACK, f.question)}
+          </span>{" "}
+          <span className="font-medium">
+            {answerLabel(SESSION_FEEDBACK, f.question, f.answer)}
+          </span>
+        </p>
+      ))}
+    </div>
+  )
+}
+
 function SessionRow({ session }: { session: WorkoutSession }) {
   const [open, setOpen] = useState(false)
 
@@ -151,11 +174,22 @@ function SessionRow({ session }: { session: WorkoutSession }) {
             )}
           </div>
         </TableCell>
-        <TableCell>{session.completion_percentage}%</TableCell>
+        <TableCell>
+          <div className="flex items-center gap-2">
+            {session.completion_percentage}%
+            {session.workout_type !== "cardio" &&
+              session.feedback.map((f) => (
+                <Badge key={f.question} variant="outline">
+                  {answerLabel(SESSION_FEEDBACK, f.question, f.answer)}
+                </Badge>
+              ))}
+          </div>
+        </TableCell>
       </TableRow>
       {open && (
         <TableRow>
           <TableCell colSpan={COLUMNS} className="bg-surface-lowest">
+            <SessionFeedback session={session} />
             <SessionExercises sessionUuid={session.uuid} />
           </TableCell>
         </TableRow>
