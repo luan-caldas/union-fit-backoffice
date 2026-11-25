@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { requireAdmin } from "@/lib/auth/require-admin"
 import type { Json } from "@/lib/supabase/database.types"
 
@@ -112,6 +113,26 @@ export async function getUsers(params: {
       user_subscriptions: subsMap.get(u.id) ?? null,
     })),
   }
+}
+
+// Liga/desliga a evolução automática de treino (workflow n8n das 6h) do usuário.
+export async function setUserAutoEvolution(userId: string, enabled: boolean) {
+  const admin = await requireAdmin()
+
+  if (!UUID_RE.test(userId) || typeof enabled !== "boolean") {
+    throw new Error("Dados inválidos.")
+  }
+
+  const { data, error } = await admin
+    .from("user")
+    .update({ auto_evolution_enabled: enabled })
+    .eq("id", userId)
+    .select("id")
+
+  if (error) throw new Error("Erro ao atualizar a evolução automática.")
+  if (!data?.length) throw new Error("Usuário não encontrado.")
+
+  revalidatePath(`/users/${userId}`)
 }
 
 export async function getUserById(id: string) {

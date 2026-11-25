@@ -3,6 +3,7 @@ import { Header } from "@/components/layout/header"
 import { UserDetailHeader } from "@/components/users/user-detail-header"
 import { UserInfoWorkoutCard } from "@/components/users/user-info-workout-card"
 import { UserSubscriptionCard } from "@/components/users/user-subscription-card"
+import { UserAutoEvolutionToggle } from "@/components/users/user-auto-evolution-toggle"
 import { UserTrainingSection } from "@/components/users/user-training-section"
 import { UserTrainingEmpty } from "@/components/users/user-training-empty"
 import { getUserById } from "@/actions/users.actions"
@@ -59,7 +60,13 @@ export default async function UserDetailPage({ params }: Props) {
           </div>
 
           <div>
-            <h3 className="font-semibold text-foreground mb-3">Treino</h3>
+            <div className="mb-3 flex items-start justify-between gap-4">
+              <h3 className="font-semibold text-foreground">Treino</h3>
+              <UserAutoEvolutionToggle
+                userId={id}
+                enabled={user.auto_evolution_enabled}
+              />
+            </div>
             {training ? (
               <UserTrainingSection
                 training={training}
