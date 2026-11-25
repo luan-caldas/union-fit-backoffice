@@ -298,6 +298,7 @@ export type Database = {
       }
       user: {
         Row: {
+          auto_evolution_enabled: boolean
           deleted_at: string | null
           email: string | null
           id: string
@@ -307,6 +308,7 @@ export type Database = {
           terms_agree: boolean
         }
         Insert: {
+          auto_evolution_enabled?: boolean
           deleted_at?: string | null
           email?: string | null
           id?: string
@@ -316,6 +318,7 @@ export type Database = {
           terms_agree?: boolean
         }
         Update: {
+          auto_evolution_enabled?: boolean
           deleted_at?: string | null
           email?: string | null
           id?: string
@@ -1002,6 +1005,7 @@ export type Database = {
       }
       "backend.user_workout_with_subscription": {
         Row: {
+          auto_evolution_enabled: boolean | null
           is_subscription_active: boolean | null
           user_uuid: string | null
           workout_date_end: string | null
