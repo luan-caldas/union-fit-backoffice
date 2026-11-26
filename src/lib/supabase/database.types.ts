@@ -1030,6 +1030,7 @@ export type Database = {
       Level: "BEGINNER" | "INTERMEDIARY" | "ADVANCED"
       Muscle:
         | "ABDOMEN"
+        | "ADDUCTOR"
         | "BACK"
         | "BICEPS"
         | "CALF"
@@ -1168,6 +1169,7 @@ export const Constants = {
       Level: ["BEGINNER", "INTERMEDIARY", "ADVANCED"],
       Muscle: [
         "ABDOMEN",
+        "ADDUCTOR",
         "BACK",
         "BICEPS",
         "CALF",

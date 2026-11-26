@@ -4,6 +4,7 @@ type Muscle = Database["public"]["Enums"]["Muscle"]
 
 export const MUSCLE_LABELS: Record<Muscle, string> = {
   ABDOMEN: "Abdômen",
+  ADDUCTOR: "Adutor",
   BACK: "Costas",
   BICEPS: "Bíceps",
   CALF: "Panturrilha",
