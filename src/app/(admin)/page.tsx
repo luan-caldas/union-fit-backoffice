@@ -1,6 +1,8 @@
 import { Users, CreditCard, Dumbbell } from "lucide-react"
 import { Header } from "@/components/layout/header"
 import { DashboardMetricCard } from "@/components/dashboard/dashboard-metric-card"
+import { DashboardChartsSection } from "@/components/dashboard/dashboard-charts-section"
+import { DashboardTrainingLevelChart } from "@/components/dashboard/dashboard-training-level-chart"
 import { requireAdmin } from "@/lib/auth/require-admin"
 
 async function getDashboardMetrics() {
@@ -73,6 +75,8 @@ export default async function DashboardPage() {
               href="/users?filter=no-training"
             />
           </div>
+          <DashboardChartsSection />
+          <DashboardTrainingLevelChart />
         </div>
       </main>
     </>
