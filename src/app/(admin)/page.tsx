@@ -40,18 +40,18 @@ export default async function DashboardPage() {
         <div className="max-w-4xl space-y-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <DashboardMetricCard
-              icon={Users}
+              icon={<Users className="h-5 w-5 text-brand-500" />}
               label="Usuários"
               value={totalUsers}
               href="/users"
             />
             <DashboardMetricCard
-              icon={CreditCard}
+              icon={<CreditCard className="h-5 w-5 text-brand-500" />}
               label="Assinaturas ativas"
               value={activeSubscriptions}
             />
             <DashboardMetricCard
-              icon={Dumbbell}
+              icon={<Dumbbell className="h-5 w-5 text-brand-500" />}
               label="Sem treino"
               value={usersWithoutTraining}
             />

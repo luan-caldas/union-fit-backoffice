@@ -1,19 +1,19 @@
 "use client"
 
 import Link from "next/link"
-import { type LucideIcon } from "lucide-react"
+import type { ReactNode } from "react"
 import { RollingNumber } from "@/components/ui/rolling-number"
 import { cn } from "@/lib/utils"
 
 interface DashboardMetricCardProps {
-  icon: LucideIcon
+  icon: ReactNode
   label: string
   value: number
   href?: string
 }
 
 export function DashboardMetricCard({
-  icon: Icon,
+  icon,
   label,
   value,
   href,
@@ -26,7 +26,7 @@ export function DashboardMetricCard({
       )}
     >
       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-50">
-        <Icon className="h-5 w-5 text-brand-500" />
+        {icon}
       </div>
       <div>
         <p className="text-sm text-muted-foreground">{label}</p>
