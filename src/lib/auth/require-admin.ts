@@ -1,6 +1,10 @@
+import { cache } from "react"
 import { createClient } from "@/lib/supabase/server"
 
-export async function requireAdmin() {
+// cache() deduplicates calls within the same server render cycle —
+// avoids redundant auth.getUser + user_role queries when multiple
+// server functions call requireAdmin() on the same request.
+export const requireAdmin = cache(async () => {
   const supabase = await createClient()
 
   const {
@@ -18,4 +22,4 @@ export async function requireAdmin() {
   if (roleRow?.role !== "ADMIN") throw new Error("Forbidden")
 
   return supabase
-}
+})

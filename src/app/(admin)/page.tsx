@@ -54,7 +54,7 @@ export default async function DashboardPage() {
     <>
       <Header title="Dashboard" />
       <main className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-4xl space-y-6">
+        <div className="max-w-4xl mx-auto space-y-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <DashboardMetricCard
               icon={<Users className="h-5 w-5 text-brand-500" />}

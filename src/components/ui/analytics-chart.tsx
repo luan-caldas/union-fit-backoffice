@@ -96,6 +96,7 @@ export interface AnalyticsTooltipProps {
   px: number
   py: number
   side: "top" | "bottom"
+  align: "left" | "right"
   valueLabel: string
   show: boolean
   /** When true, stacks above pinned/static tooltip cards */
@@ -108,6 +109,7 @@ export function AnalyticsTooltip({
   px,
   py,
   side,
+  align,
   valueLabel,
   show,
   isHovered = false,
@@ -159,10 +161,14 @@ export function AnalyticsTooltip({
         style={{
           position: "absolute",
           whiteSpace: "nowrap",
-          // Horizontal: card's near edge aligns roughly with the circle
+          // Horizontal: extend toward center so edge points don't overflow
           ...(isTop
-            ? { bottom: circR * 2 + gap, right: -(circR + 2) }
-            : { top: circR * 2 + gap, left: -(circR + 2) }),
+            ? align === "left"
+              ? { bottom: circR * 2 + gap, left: -(circR + 2) }
+              : { bottom: circR * 2 + gap, right: -(circR + 2) }
+            : align === "left"
+              ? { top: circR * 2 + gap, left: -(circR + 2) }
+              : { top: circR * 2 + gap, right: -(circR + 2) }),
           background: "var(--card)",
           borderRadius: 10,
           padding: "9px 13px",
@@ -318,7 +324,7 @@ export function AnalyticsLineChart({
       return pinnedIndices
     }
     if (points.length >= 3) {
-      return [2, points.length - 1]
+      return [0, points.length - 1]
     }
     return points.length === 2 ? [0, 1] : [0]
   }, [pinnedIndices, points.length])
@@ -468,6 +474,7 @@ export function AnalyticsLineChart({
       {/* Tooltip layer */}
       {points.map((p, i) => (
         <AnalyticsTooltip
+          align={p.x > VB_W / 2 ? "right" : "left"}
           color={p.color}
           isHovered={hovered === i}
           key={`tooltip-${p.date}-${p.label}-${p.value}`}

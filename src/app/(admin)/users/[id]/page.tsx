@@ -35,7 +35,7 @@ export default async function UserDetailPage({ params }: Props) {
     <>
       <Header title="Detalhes do Usuário" />
       <main className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-3xl space-y-4">
+        <div className="max-w-3xl mx-auto space-y-4">
           <Button variant="ghost" size="sm" asChild className="gap-1.5 -ml-2 text-muted-foreground">
             <Link href="/users">
               <ArrowLeft className="h-4 w-4" />

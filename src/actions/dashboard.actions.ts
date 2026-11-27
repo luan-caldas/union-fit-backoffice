@@ -100,11 +100,8 @@ function groupByPeriod(dates: string[], period: ChartPeriod): TimeSeriesPoint[] 
 
 // ─── Server actions ──────────────────────────────────────────────────────────
 
-const LEVEL_LABELS: Record<string, string> = {
-  BEGINNER: "Iniciante",
-  INTERMEDIARY: "Intermediário",
-  ADVANCED: "Avançado",
-}
+// api.training.level stores the display label directly (not the Level enum)
+const LEVEL_ORDER = ["Iniciante", "Intermediário", "Avançado"]
 
 export async function getNewTrainingsChart(period: ChartPeriod): Promise<TimeSeriesPoint[]> {
   const admin = await requireAdmin()
@@ -150,17 +147,16 @@ export async function getTrainingLevelDistribution(): Promise<LevelPoint[]> {
     counts.set(row.level, (counts.get(row.level) ?? 0) + 1)
   }
 
-  const knownOrder = ["BEGINNER", "INTERMEDIARY", "ADVANCED"]
   const result: LevelPoint[] = []
 
-  for (const level of knownOrder) {
+  for (const level of LEVEL_ORDER) {
     if (counts.has(level)) {
-      result.push({ level, label: LEVEL_LABELS[level] ?? level, count: counts.get(level)! })
+      result.push({ level, label: level, count: counts.get(level)! })
     }
   }
 
   for (const [level, count] of counts) {
-    if (!knownOrder.includes(level)) {
+    if (!LEVEL_ORDER.includes(level)) {
       result.push({ level, label: level, count })
     }
   }
