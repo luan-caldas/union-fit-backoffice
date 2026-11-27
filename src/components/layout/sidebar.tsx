@@ -2,11 +2,12 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Dumbbell, Users, Zap, BarChart2 } from "lucide-react"
+import { Dumbbell, Users, Zap, BarChart2, LayoutDashboard } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useSidebar } from "./sidebar-context"
 
 const navItems = [
+  { href: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/users", label: "Usuários", icon: Users },
   { href: "/exercises", label: "Exercícios", icon: Dumbbell },
   { href: "/methods", label: "Métodos", icon: Zap },
@@ -44,8 +45,8 @@ export function Sidebar() {
 
         <nav className="flex-1 overflow-y-auto p-2">
           <ul className="space-y-0.5">
-            {navItems.map(({ href, label, icon: Icon }) => {
-              const active = pathname.startsWith(href)
+            {navItems.map(({ href, label, icon: Icon, exact }) => {
+              const active = exact ? pathname === href : pathname.startsWith(href)
               return (
                 <li key={href}>
                   <Link
