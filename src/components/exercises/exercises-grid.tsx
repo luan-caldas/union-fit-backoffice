@@ -9,7 +9,7 @@ import { ExercisesFilters } from "./exercises-filters"
 import { ExerciseFormDialog } from "./exercise-form-dialog"
 import { useExercises } from "@/hooks/use-exercises"
 import type { ExerciseRow } from "@/actions/exercises.actions"
-import { Plus } from "lucide-react"
+import { Plus, Dumbbell } from "lucide-react"
 
 export function ExercisesGrid() {
   const { data: exercises = [], isLoading } = useExercises()
@@ -79,8 +79,12 @@ export function ExercisesGrid() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="py-16 text-center text-muted-foreground">
-          Nenhum exercício encontrado
+        <div className="py-16 text-center">
+          <Dumbbell className="mx-auto h-8 w-8 text-muted-foreground/50 mb-3" />
+          <p className="font-medium text-foreground">Nenhum exercício encontrado</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Tente ajustar os filtros ou adicione um novo exercício
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">

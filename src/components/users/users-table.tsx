@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { Users } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -84,8 +85,12 @@ export function UsersTable() {
               ))
             ) : users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
-                  Nenhum usuário encontrado
+                <TableCell colSpan={5} className="py-14 text-center">
+                  <Users className="mx-auto h-8 w-8 text-muted-foreground/50 mb-3" />
+                  <p className="font-medium text-foreground">Nenhum usuário encontrado</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Tente ajustar os filtros de busca
+                  </p>
                 </TableCell>
               </TableRow>
             ) : (
