@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import { toast } from "sonner"
 import { Switch } from "@/components/ui/switch"
 import { setUserAutoEvolution } from "@/actions/users.actions"
 
@@ -14,22 +15,19 @@ export function UserAutoEvolutionToggle({
   enabled: initialEnabled,
 }: UserAutoEvolutionToggleProps) {
   const [enabled, setEnabled] = useState(initialEnabled)
-  const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
   function handleChange(next: boolean) {
     const previous = enabled
     setEnabled(next)
-    setError(null)
 
     startTransition(async () => {
       try {
         await setUserAutoEvolution(userId, next)
+        toast.success(next ? "Evolução automática ativada" : "Evolução automática desativada")
       } catch (e) {
         setEnabled(previous)
-        setError(
-          e instanceof Error ? e.message : "Erro ao atualizar a evolução automática."
-        )
+        toast.error(e instanceof Error ? e.message : "Erro ao atualizar a evolução automática.")
       }
     })
   }
@@ -50,7 +48,6 @@ export function UserAutoEvolutionToggle({
           ? "Um novo treino é gerado automaticamente a cada ciclo."
           : "Desativada: nenhum novo treino será gerado automaticamente para este usuário."}
       </p>
-      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   )
 }
