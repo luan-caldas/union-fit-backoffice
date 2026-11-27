@@ -6,27 +6,42 @@ import { requireAdmin } from "@/lib/auth/require-admin"
 async function getDashboardMetrics() {
   const admin = await requireAdmin()
 
-  const [usersResult, subsResult, trainingResult] = await Promise.all([
+  const now = new Date().toISOString()
+
+  const [usersResult, activeSubs, trainings] = await Promise.all([
     admin
       .from("user")
       .select("*", { count: "exact", head: true })
       .is("deleted_at", null),
     admin
       .from("user_subscriptions")
-      .select("*", { count: "exact", head: true })
+      .select("user_id")
       .eq("is_active", true)
-      .or("expiration_at.is.null,expiration_at.gt." + new Date().toISOString()),
+      .or(`expiration_at.is.null,expiration_at.gt.${now}`),
     admin
       .from("api.training")
-      .select("user_uuid", { count: "exact", head: true }),
+      .select("user_uuid"),
   ])
 
   const totalUsers = usersResult.count ?? 0
-  const activeSubscriptions = subsResult.count ?? 0
-  const usersWithTraining = trainingResult.count ?? 0
-  const usersWithoutTraining = Math.max(0, totalUsers - usersWithTraining)
 
-  return { totalUsers, activeSubscriptions, usersWithoutTraining }
+  // Distinct non-deleted users with active subscription
+  const activeSubUserIds = [...new Set((activeSubs.data ?? []).map((s) => s.user_id).filter(Boolean))]
+  const { count: activeSubscriptions } = activeSubUserIds.length
+    ? await admin
+        .from("user")
+        .select("*", { count: "exact", head: true })
+        .is("deleted_at", null)
+        .in("id", activeSubUserIds as string[])
+    : { count: 0 }
+
+  // Distinct users with training → subtract from total
+  const distinctUsersWithTraining = new Set(
+    (trainings.data ?? []).map((t) => t.user_uuid).filter(Boolean)
+  ).size
+  const usersWithoutTraining = Math.max(0, totalUsers - distinctUsersWithTraining)
+
+  return { totalUsers, activeSubscriptions: activeSubscriptions ?? 0, usersWithoutTraining }
 }
 
 export default async function DashboardPage() {
