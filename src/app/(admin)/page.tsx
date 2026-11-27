@@ -49,11 +49,13 @@ export default async function DashboardPage() {
               icon={<CreditCard className="h-5 w-5 text-brand-500" />}
               label="Assinaturas ativas"
               value={activeSubscriptions}
+              href="/users?filter=active-subscription"
             />
             <DashboardMetricCard
               icon={<Dumbbell className="h-5 w-5 text-brand-500" />}
               label="Sem treino"
               value={usersWithoutTraining}
+              href="/users?filter=no-training"
             />
           </div>
         </div>

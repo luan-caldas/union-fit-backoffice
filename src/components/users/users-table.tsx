@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Users } from "lucide-react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Users, X } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -18,7 +18,12 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { UsersFilters } from "./users-filters"
 import { useUsers } from "@/hooks/use-users"
 import { truncateUuid } from "@/lib/utils/format"
-import type { UserWithSubscription } from "@/actions/users.actions"
+import type { UserWithSubscription, UsersFilter } from "@/actions/users.actions"
+
+const FILTER_LABELS: Record<UsersFilter, string> = {
+  "active-subscription": "Assinatura ativa",
+  "no-training": "Sem treino",
+}
 
 function isSubscriptionActive(
   sub: UserWithSubscription["user_subscriptions"]
@@ -33,6 +38,10 @@ const PAGE_SIZE = 50
 
 export function UsersTable() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const rawFilter = searchParams.get("filter")
+  const filter = (rawFilter && rawFilter in FILTER_LABELS ? rawFilter : undefined) as UsersFilter | undefined
+
   const [search, setSearch] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [page, setPage] = useState(1)
@@ -45,10 +54,14 @@ export function UsersTable() {
     return () => clearTimeout(t)
   }, [search])
 
+  // Reset page when filter changes
+  useEffect(() => { setPage(1) }, [filter])
+
   const { data, isLoading, isFetching } = useUsers({
     page,
     pageSize: PAGE_SIZE,
     search: debouncedSearch,
+    filter,
   })
 
   const users = data?.users ?? []
@@ -57,7 +70,21 @@ export function UsersTable() {
 
   return (
     <div className="space-y-4">
-      <UsersFilters search={search} onSearchChange={setSearch} />
+      <div className="flex flex-wrap items-center gap-2">
+        <UsersFilters search={search} onSearchChange={setSearch} />
+        {filter && (
+          <span className="flex items-center gap-1 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">
+            {FILTER_LABELS[filter]}
+            <button
+              onClick={() => router.push("/users")}
+              className="ml-0.5 rounded-full p-0.5 hover:bg-brand-100 transition-colors"
+              aria-label="Remover filtro"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </span>
+        )}
+      </div>
 
       <div
         className={`rounded-lg border border-border bg-white overflow-hidden ${isFetching && !isLoading ? "opacity-60" : ""}`}
