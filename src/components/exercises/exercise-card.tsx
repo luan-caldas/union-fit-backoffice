@@ -19,7 +19,7 @@ export function ExerciseCard({ exercise, onEdit }: ExerciseCardProps) {
 
   return (
     <div
-      className="rounded-xl border border-border bg-white overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+      className="rounded-xl border border-border bg-white overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-150 cursor-pointer"
       onClick={() => onEdit(exercise)}
     >
       <div className="aspect-video w-full bg-surface-highest overflow-hidden">
@@ -27,6 +27,8 @@ export function ExerciseCard({ exercise, onEdit }: ExerciseCardProps) {
           <img
             src={thumbnail}
             alt={exercise.name}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         ) : (

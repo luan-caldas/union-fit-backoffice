@@ -1,0 +1,45 @@
+"use client"
+
+import Link from "next/link"
+import type { ReactNode } from "react"
+import { RollingNumber } from "@/components/ui/rolling-number"
+import { cn } from "@/lib/utils"
+
+interface DashboardMetricCardProps {
+  icon: ReactNode
+  label: string
+  value: number
+  href?: string
+}
+
+export function DashboardMetricCard({
+  icon,
+  label,
+  value,
+  href,
+}: DashboardMetricCardProps) {
+  const card = (
+    <div
+      className={cn(
+        "flex items-center gap-4 rounded-xl border border-border bg-white p-6 transition-colors",
+        href && "cursor-pointer hover:bg-surface-lowest"
+      )}
+    >
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand-50">
+        {icon}
+      </div>
+      <div>
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="text-2xl font-bold text-foreground">
+          <RollingNumber value={value} />
+        </p>
+      </div>
+    </div>
+  )
+
+  if (href) {
+    return <Link href={href}>{card}</Link>
+  }
+
+  return card
+}

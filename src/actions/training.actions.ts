@@ -143,10 +143,18 @@ export async function duplicateDivision(divisionUuid: string, userId: string) {
     .single()
   if (sourceError || !source) throw new Error("Divisão não encontrada.")
 
-  const { count } = await admin
-    .from("workout.training.division")
-    .select("uuid", { count: "exact", head: true })
-    .eq("workout_uuid", source.workout_uuid)
+  const [{ count }, { data: exercises, error: exercisesError }] = await Promise.all([
+    admin
+      .from("workout.training.division")
+      .select("uuid", { count: "exact", head: true })
+      .eq("workout_uuid", source.workout_uuid),
+    admin
+      .from("workout.training.division.exercise")
+      .select("*")
+      .eq("division_uuid", divisionUuid)
+      .order("order"),
+  ])
+  if (exercisesError) throw new Error("Erro ao duplicar exercícios da divisão.")
 
   const { data: copy, error: copyError } = await admin
     .from("workout.training.division")
@@ -161,16 +169,6 @@ export async function duplicateDivision(divisionUuid: string, userId: string) {
     .select("uuid")
     .single()
   if (copyError || !copy) throw new Error("Erro ao duplicar divisão.")
-
-  const { data: exercises, error: exercisesError } = await admin
-    .from("workout.training.division.exercise")
-    .select("*")
-    .eq("division_uuid", divisionUuid)
-    .order("order")
-  if (exercisesError) {
-    await admin.from("workout.training.division").delete().eq("uuid", copy.uuid)
-    throw new Error("Erro ao duplicar exercícios da divisão.")
-  }
 
   if (exercises && exercises.length > 0) {
     const { error: insertError } = await admin

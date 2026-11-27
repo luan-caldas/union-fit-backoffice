@@ -59,10 +59,13 @@ function toIlikePattern(term: string) {
   return `"%${quoted}%"`
 }
 
+export type UsersFilter = "active-subscription" | "no-training"
+
 export async function getUsers(params: {
   page: number
   pageSize: number
   search?: string
+  filter?: UsersFilter
 }): Promise<UsersPage> {
   const admin = await requireAdmin()
 
@@ -81,6 +84,26 @@ export async function getUsers(params: {
     const filters = [`name.ilike.${pattern}`, `email.ilike.${pattern}`]
     if (UUID_RE.test(search)) filters.push(`id.eq.${search}`)
     query = query.or(filters.join(","))
+  }
+
+  if (params.filter === "active-subscription") {
+    const { data: subs } = await admin
+      .from("user_subscriptions")
+      .select("user_id")
+      .eq("is_active", true)
+      .or("expiration_at.is.null,expiration_at.gt." + new Date().toISOString())
+    const ids = (subs ?? []).map((s) => s.user_id).filter(Boolean)
+    query = ids.length ? query.in("id", ids as string[]) : query.in("id", [""])
+  }
+
+  if (params.filter === "no-training") {
+    const { data: trainings } = await admin
+      .from("api.training")
+      .select("user_uuid")
+    const withTraining = [...new Set((trainings ?? []).map((t) => t.user_uuid).filter(Boolean))]
+    if (withTraining.length) {
+      query = query.not("id", "in", `(${withTraining.join(",")})`)
+    }
   }
 
   const usersResult = await query

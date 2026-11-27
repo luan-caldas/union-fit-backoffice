@@ -1,32 +1,39 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "@/actions/auth.actions"
+import { signIn, type SignInError } from "@/actions/auth.actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Dumbbell } from "lucide-react"
+import { Dumbbell, WifiOff, ShieldOff, AlertCircle } from "lucide-react"
+
+const ERROR_ICONS = {
+  network: WifiOff,
+  forbidden: ShieldOff,
+  auth: AlertCircle,
+} as const
 
 export function LoginForm() {
-  const [error, setError] = useState<string | null>(null)
+  const [errorInfo, setErrorInfo] = useState<SignInError | null>(null)
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setError(null)
+    setErrorInfo(null)
     setLoading(true)
 
     const form = e.currentTarget
     const email = (form.elements.namedItem("email") as HTMLInputElement).value
-    const password = (form.elements.namedItem("password") as HTMLInputElement)
-      .value
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value
 
     const result = await signIn(email, password)
     if (result?.error) {
-      setError(result.error)
+      setErrorInfo(result)
       setLoading(false)
     }
   }
+
+  const ErrorIcon = errorInfo ? ERROR_ICONS[errorInfo.type] : null
 
   return (
     <div className="flex min-h-svh items-center justify-center bg-surface-lowest p-4">
@@ -64,10 +71,11 @@ export function LoginForm() {
             />
           </div>
 
-          {error && (
-            <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              {error}
-            </p>
+          {errorInfo && (
+            <div className="flex items-start gap-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {ErrorIcon && <ErrorIcon className="mt-0.5 h-4 w-4 shrink-0" />}
+              <span>{errorInfo.error}</span>
+            </div>
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>

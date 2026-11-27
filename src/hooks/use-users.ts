@@ -1,12 +1,13 @@
 "use client"
 
 import { keepPreviousData, useQuery } from "@tanstack/react-query"
-import { getUsers } from "@/actions/users.actions"
+import { getUsers, type UsersFilter } from "@/actions/users.actions"
 
 export function useUsers(params: {
   page: number
   pageSize: number
   search: string
+  filter?: UsersFilter
 }) {
   return useQuery({
     queryKey: ["users", params],

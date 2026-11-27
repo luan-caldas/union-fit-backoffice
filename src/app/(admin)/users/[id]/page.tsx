@@ -1,23 +1,15 @@
 import { notFound } from "next/navigation"
+import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 import { Header } from "@/components/layout/header"
 import { UserDetailHeader } from "@/components/users/user-detail-header"
-import { UserInfoWorkoutCard } from "@/components/users/user-info-workout-card"
-import { UserSubscriptionCard } from "@/components/users/user-subscription-card"
-import { UserAutoEvolutionToggle } from "@/components/users/user-auto-evolution-toggle"
-import { UserTrainingSection } from "@/components/users/user-training-section"
-import { UserTrainingEmpty } from "@/components/users/user-training-empty"
+import { UserDetailTabs } from "@/components/users/user-detail-tabs"
+import { Button } from "@/components/ui/button"
 import { getUserById } from "@/actions/users.actions"
 import { getTrainingByUserId } from "@/actions/training.actions"
 import { getCardiosByUserId } from "@/actions/cardio.actions"
 import { getExercises } from "@/actions/exercises.actions"
 import { getMethods } from "@/actions/methods.actions"
-import { UserCardioSection } from "@/components/users/user-cardio-section"
-import { UserWorkoutHistorySection } from "@/components/users/user-workout-history-section"
-import { UserSessionFeedbackChart } from "@/components/users/user-session-feedback-chart"
-import { UserCycleFeedbackHistory } from "@/components/users/user-cycle-feedback-history"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
 
 interface Props {
   params: Promise<{ id: string }>
@@ -43,7 +35,7 @@ export default async function UserDetailPage({ params }: Props) {
     <>
       <Header title="Detalhes do Usuário" />
       <main className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-3xl space-y-4">
+        <div className="max-w-3xl mx-auto space-y-4">
           <Button variant="ghost" size="sm" asChild className="gap-1.5 -ml-2 text-muted-foreground">
             <Link href="/users">
               <ArrowLeft className="h-4 w-4" />
@@ -56,42 +48,16 @@ export default async function UserDetailPage({ params }: Props) {
             trainingStatus={infoWorkoutData?.training_status as string | null}
           />
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <UserInfoWorkoutCard infoWorkout={infoWorkout} />
-            <UserSubscriptionCard subscription={subscription} />
-          </div>
-
-          <div>
-            <div className="mb-3 flex items-start justify-between gap-4">
-              <h3 className="font-semibold text-foreground">Treino</h3>
-              <UserAutoEvolutionToggle
-                userId={id}
-                enabled={user.auto_evolution_enabled}
-              />
-            </div>
-            {training ? (
-              <UserTrainingSection
-                training={training}
-                methods={methods}
-                allExercises={allExercises}
-                userId={id}
-              />
-            ) : (
-              <UserTrainingEmpty />
-            )}
-          </div>
-
-          <UserCardioSection
-            cardios={cardios}
+          <UserDetailTabs
+            user={user}
+            infoWorkout={infoWorkout}
+            subscription={subscription}
+            training={training}
             allExercises={allExercises}
+            methods={methods}
+            cardios={cardios}
             userId={id}
           />
-
-          <UserSessionFeedbackChart userId={id} />
-
-          <UserWorkoutHistorySection userId={id} />
-
-          <UserCycleFeedbackHistory userId={id} />
         </div>
       </main>
     </>

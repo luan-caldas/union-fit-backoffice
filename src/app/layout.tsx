@@ -3,6 +3,7 @@ import { Rethink_Sans } from "next/font/google"
 import "./globals.css"
 import { QueryProvider } from "@/providers/query-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { Toaster } from "sonner"
 
 const rethinkSans = Rethink_Sans({
   variable: "--font-rethink",
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className="min-h-full">
         <QueryProvider>
           <TooltipProvider>{children}</TooltipProvider>
+          <Toaster position="bottom-right" richColors closeButton />
         </QueryProvider>
       </body>
     </html>

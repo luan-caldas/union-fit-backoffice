@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useSessionFeedbackStats } from "@/hooks/use-workout-sessions"
@@ -19,6 +19,13 @@ const QUESTION = "difficulty"
 export function UserSessionFeedbackChart({ userId }: { userId: string }) {
   const [period, setPeriod] = useState<FeedbackPeriod>("past")
   const { data, isLoading, isError, refetch } = useSessionFeedbackStats(userId, period)
+  const [animated, setAnimated] = useState(false)
+
+  useEffect(() => {
+    setAnimated(false)
+    const id = setTimeout(() => setAnimated(true), 50)
+    return () => clearTimeout(id)
+  }, [data])
 
   const known = Object.keys(SESSION_FEEDBACK[QUESTION].answers)
   const extra = data ? Object.keys(data.counts).filter((k) => !known.includes(k)) : []
@@ -65,16 +72,21 @@ export function UserSessionFeedbackChart({ userId }: { userId: string }) {
             const pct = Math.round((count / data.total) * 100)
             return (
               <div key={k} className="text-sm">
-                <div className="mb-1 flex justify-between">
-                  <span>{answerLabel(SESSION_FEEDBACK, QUESTION, k)}</span>
-                  <span className="text-muted-foreground">
-                    {count} ({pct}%)
+                <div className="mb-1.5 flex justify-between">
+                  <span className="font-medium text-foreground">
+                    {answerLabel(SESSION_FEEDBACK, QUESTION, k)}
+                  </span>
+                  <span className="tabular-nums text-muted-foreground">
+                    {count} <span className="text-xs">({pct}%)</span>
                   </span>
                 </div>
-                <div className="h-2.5 rounded-full bg-muted">
+                <div className="h-2 rounded-full bg-muted">
                   <div
-                    className="h-full rounded-full bg-primary"
-                    style={{ width: `${pct}%` }}
+                    className="h-full rounded-full bg-brand-400"
+                    style={{
+                      width: animated ? `${pct}%` : "0%",
+                      transition: "width 0.5s ease-out",
+                    }}
                   />
                 </div>
               </div>

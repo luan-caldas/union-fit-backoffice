@@ -3,19 +3,33 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 
+export type SignInError = {
+  error: string
+  type: "network" | "auth" | "forbidden"
+}
+
 export async function signIn(
   email: string,
   password: string
-): Promise<{ error: string } | never> {
+): Promise<SignInError | never> {
   const supabase = await createClient()
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  })
+  let data: Awaited<ReturnType<typeof supabase.auth.signInWithPassword>>["data"]
+  let authError: Awaited<ReturnType<typeof supabase.auth.signInWithPassword>>["error"]
 
-  if (error || !data.user) {
-    return { error: "Credenciais inválidas. Verifique seu e-mail e senha." }
+  try {
+    const result = await supabase.auth.signInWithPassword({ email, password })
+    data = result.data
+    authError = result.error
+  } catch (e) {
+    return {
+      error: "Sem conexão com o servidor. Verifique sua internet e tente novamente.",
+      type: "network",
+    }
+  }
+
+  if (authError || !data.user) {
+    return { error: "E-mail ou senha incorretos.", type: "auth" }
   }
 
   const { data: roleRow } = await supabase
@@ -27,7 +41,8 @@ export async function signIn(
   if (roleRow?.role !== "ADMIN") {
     await supabase.auth.signOut()
     return {
-      error: "Acesso negado. Apenas administradores podem acessar este painel.",
+      error: "Acesso negado. Apenas administradores podem entrar.",
+      type: "forbidden",
     }
   }
 
