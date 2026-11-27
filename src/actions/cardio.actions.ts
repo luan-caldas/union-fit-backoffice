@@ -147,10 +147,18 @@ export async function duplicateCardio(cardioUuid: string, userId: string) {
     .single()
   if (sourceError || !source) throw new Error("Treino de cardio não encontrado.")
 
-  const { count } = await admin
-    .from("workout.cardio")
-    .select("uuid", { count: "exact", head: true })
-    .eq("user_uuid", source.user_uuid)
+  const [{ count }, { data: exercises, error: exercisesError }] = await Promise.all([
+    admin
+      .from("workout.cardio")
+      .select("uuid", { count: "exact", head: true })
+      .eq("user_uuid", source.user_uuid),
+    admin
+      .from("workout.cardio.exercise")
+      .select("*")
+      .eq("cardio_uuid", cardioUuid)
+      .order("order"),
+  ])
+  if (exercisesError) throw new Error("Erro ao duplicar exercícios do treino de cardio.")
 
   const { data: copy, error: copyError } = await admin
     .from("workout.cardio")
@@ -164,16 +172,6 @@ export async function duplicateCardio(cardioUuid: string, userId: string) {
     .select("uuid")
     .single()
   if (copyError || !copy) throw new Error("Erro ao duplicar treino de cardio.")
-
-  const { data: exercises, error: exercisesError } = await admin
-    .from("workout.cardio.exercise")
-    .select("*")
-    .eq("cardio_uuid", cardioUuid)
-    .order("order")
-  if (exercisesError) {
-    await admin.from("workout.cardio").delete().eq("uuid", copy.uuid)
-    throw new Error("Erro ao duplicar exercícios do treino de cardio.")
-  }
 
   if (exercises && exercises.length > 0) {
     const { error: insertError } = await admin.from("workout.cardio.exercise").insert(

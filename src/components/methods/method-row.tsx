@@ -22,7 +22,7 @@ export function MethodListRow({ method, levelTitles, objectiveTitles, onEdit }: 
     >
       <div className="h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-surface-highest">
         {thumbnail ? (
-          <img src={thumbnail} alt={method.name} className="h-full w-full object-cover" />
+          <img src={thumbnail} alt={method.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <PlayCircle className="h-5 w-5 text-muted-foreground/40" />

@@ -27,6 +27,8 @@ export function ExerciseCard({ exercise, onEdit }: ExerciseCardProps) {
           <img
             src={thumbnail}
             alt={exercise.name}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         ) : (
